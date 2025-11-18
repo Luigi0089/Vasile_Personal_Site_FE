@@ -1,0 +1,107 @@
+<div class="week-toolbar">
+  <button (click)="goPrevWeek()" class="btn-nav">‹</button>
+  <div class="title">
+    {{ weekStart | date:'dd/MM' }} – {{ weekEnd | date:'dd/MM' }}
+  </div>
+  <button (click)="goNextWeek()" class="btn-nav">›</button>
+</div>
+
+<div class="notice" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+<div class="grid" *ngIf="grid.length">
+  <!-- header giorni -->
+  <div class="col header"></div>
+  <div class="col header" *ngFor="let d of daysISO; let i = index">
+    {{ dayHeader(i) }}
+  </div>
+
+  <!-- righe slot (numero massimo di righe tra i giorni) -->
+  <ng-container *ngFor="let rowIdx of grid[0]; let r = index">
+    <div class="row">
+      <div class="col rowtime">
+        {{ grid[0][r]?.label }}
+      </div>
+      <div class="col cell"
+           *ngFor="let dayCol of grid; let c = index"
+           [class.empty]="!dayCol[r]"
+           [class.busy]="dayCol[r]?.busy"
+           [class.free]="dayCol[r] && !dayCol[r].busy"
+           (click)="dayCol[r]?.busy ? onClickBusy(dayCol[r]) : onClickFree(dayCol[r])">
+        <ng-container *ngIf="dayCol[r] as s">
+          <div class="slot-label" *ngIf="!s.busy">Libero</div>
+          <div class="slot-booked" *ngIf="s.busy">
+            {{ s.bookedBy?.nomeStudente || 'Prenotato' }}
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<!-- MODALE -->
+<div class="modal-backdrop" *ngIf="modalOpen" (click)="closeModal()"></div>
+<div class="modal" *ngIf="modalOpen">
+  <div class="modal-header">
+    <h3>{{ isEdit ? 'Modifica lezione' : 'Prenota lezione' }}</h3>
+    <button class="btn-close" (click)="closeModal()">✕</button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-grid">
+      <label>Studente
+        <input formControlName="nomeStudente" placeholder="Mario Rossi">
+      </label>
+
+      <label>Materia
+        <input formControlName="materia" placeholder="Analisi 1">
+      </label>
+
+      <label>Livello
+        <select formControlName="livello">
+          <option *ngFor="let l of livelli" [value]="l.value">{{ l.label }}</option>
+        </select>
+      </label>
+
+      <label>Data
+        <input formControlName="dataLezione" type="date">
+      </label>
+
+      <label>Inizio
+        <input formControlName="orarioInizio" type="time" step="1800">
+      </label>
+
+      <label>Fine
+        <input formControlName="orarioFine" type="time" step="1800">
+      </label>
+
+      <label class="full">Note
+        <textarea formControlName="note" rows="2" placeholder="Preferisco esercizi sui limiti"></textarea>
+      </label>
+
+      <label class="full" *ngIf="isEdit">Codice modifica
+        <input formControlName="codiceModifica" placeholder="Inserisci il codice di modifica">
+      </label>
+    </div>
+
+    <!-- conflitto con suggerimenti -->
+    <div class="conflict" *ngIf="conflict as c">
+      <div class="conflict-title">Conflitto</div>
+      <div class="conflict-msg">{{ c.message }}</div>
+      <div class="conflict-slots" *ngIf="c.fasceDisponibili?.length">
+        <div class="suggerimento" *ngFor="let f of c.fasceDisponibili">
+          Suggerimento: {{ f.orarioInizio }} – {{ f.orarioFine }}
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn-primary" [disabled]="form.invalid">
+        {{ isEdit ? 'Salva modifiche' : 'Prenota' }}
+      </button>
+      <button type="button" class="btn-secondary" (click)="closeModal()">Annulla</button>
+      <button type="button" class="btn-danger" *ngIf="isEdit && form.value.id" (click)="annulla(form.value.id!)">
+        Annulla lezione
+      </button>
+    </div>
+  </form>
+</div>

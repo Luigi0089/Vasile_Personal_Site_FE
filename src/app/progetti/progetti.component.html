@@ -1,0 +1,31 @@
+<div class="repo-list" *ngIf="!loadingRepos; else loadingReposTpl">
+  <h2 class="section-title">I miei progetti</h2>
+  <div *ngFor="let repo of repos; trackBy: trackByName" class="repo-card">
+    <h3>{{ repo.name }}</h3>
+    <p *ngIf="repo.description">{{ repo.description }}</p>
+
+    <button
+      class="readme-toggle"
+      (click)="toggleReadme(repo.name)"
+      [attr.aria-expanded]="openedReadme[repo.name]"
+      [attr.aria-controls]="'readme-'+repo.name">
+      {{ openedReadme[repo.name] ? 'Nascondi README ▲' : 'Mostra README ▼' }}
+    </button>
+
+    <div *ngIf="openedReadme[repo.name]" class="readme-content" [id]="'readme-'+repo.name">
+      <ng-container *ngIf="readmeContents[repo.name]; else loadingReadmeTpl">
+        <markdown [data]="readmeContents[repo.name]"></markdown>
+      </ng-container>
+      <ng-template #loadingReadmeTpl>
+        <p>Caricamento README in corso...</p>
+      </ng-template>
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingReposTpl>
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Caricamento progetti...</p>
+  </div>
+</ng-template>

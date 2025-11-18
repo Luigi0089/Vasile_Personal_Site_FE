@@ -1,0 +1,203 @@
+@use '../../styles' as *;
+
+
+.skills-section {
+  .section-title {
+    font-size: clamp(1.4rem, 1.1rem + 1.6vw, 2rem);
+    margin-bottom: .75rem;
+    border-bottom: 1px solid #444;
+    padding-bottom: .5rem;
+  }
+
+  .section-subtitle {
+    margin: 0 0 1.25rem 0;
+    color: #ffffff;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+}
+
+/* Controls */
+.skills-controls {
+  display: grid;
+  gap: .75rem;
+  align-items: start;
+  margin-bottom: 1rem;
+
+  @media (min-width: 900px) {
+    grid-template-columns: 1fr auto;
+  }
+
+  .chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+
+    .chip {
+      padding: .45rem .75rem;
+      border: 1px solid $line;
+      border-radius: 999px;
+      background: transparent;
+      color: #ffffff;
+      cursor: pointer;
+      transition: border-color .2s ease, background .2s ease, color .2s ease;
+
+      &.active {
+        border-color: rgba($accent,.55);
+        background: rgba($accent,.1);
+        color: $accent-2;
+      }
+      &:hover { border-color: rgba($accent,.35); }
+    }
+  }
+
+  .search-group {
+    margin-right: 2rem; // o il valore che preferisci
+    display: flex;
+    gap: .75rem;
+    align-items: center;
+    flex-wrap: wrap;
+
+    input[type="search"] {
+      min-width: 220px;
+      padding: .55rem .75rem;
+      border-radius: 10px;
+      border: 1px solid $line;
+      background: rgba(255,255,255,0.02);
+      color: $fg;
+      outline: none;
+
+      &::placeholder { color: $muted; }
+      &:focus { border-color: rgba($accent,.5); }
+    }
+
+    .toggle {
+      display: inline-flex;
+      gap: .45rem;
+      align-items: center;
+      color: #ffffff;
+
+      input { accent-color: $accent; }
+    }
+  }
+}
+
+/* Grid */
+.skills-grid {
+  display: grid;
+  gap: 1rem;
+
+  @media (min-width: 900px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Card */
+.skill-card {
+  border: 1px solid $line;
+  border-radius: 20px;
+  padding: 1rem 1.1rem;
+  background: rgba(255,255,255,0.02);
+  transition: border-color .2s ease, transform .08s ease;
+
+  &:hover {
+    border-color: rgba($accent,.35);
+    transform: translateY(-1px);
+  }
+
+  .skill-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .5rem;
+
+    .skill-name {
+      margin: 0;
+      font-size: clamp(1rem, .95rem + .6vw, 1.15rem);
+      color: #ffffff;
+      overflow-wrap: anywhere;
+    }
+
+    .skill-years {
+      color: $muted;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  .skill-meta {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    flex-wrap: wrap;
+    margin-top: .5rem;
+
+    .badge {
+      padding: .2rem .55rem;
+      border: 1px solid $line;
+      border-radius: 999px;
+      font-size: .85rem;
+      color: $muted;
+      background: rgba(255,255,255,0.02);
+    }
+
+    .meter {
+      --dots: 5;
+      --size: 8px;
+      display: inline-flex;
+      gap: .25rem;
+      margin-right: .25rem;
+
+      i {
+        width: var(--size);
+        height: var(--size);
+        border-radius: 50%;
+        border: 1px solid $line;
+        background: #0f0f10;
+        display: inline-block;
+        transform: translateZ(0);
+
+        &.fill {
+          background: $accent;
+          border-color: rgba($accent,.6);
+        }
+      }
+    }
+
+    .level-label {
+      color: $muted;
+      font-size: .9rem;
+    }
+  }
+
+  .skill-notes {
+    margin: .5rem 0 0;
+    color: lighten($fg, 8%);
+  }
+
+  .keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    margin: .6rem 0 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      padding: .2rem .5rem;
+      border-radius: 8px;
+      border: 1px dashed $line;
+      color: $muted;
+      font-size: .85rem;
+    }
+  }
+}
+
+.skill-date {
+  font-size: .85rem;
+  color: $muted;
+  margin: .25rem 0 0;
+}
+

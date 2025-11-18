@@ -1,0 +1,89 @@
+$bg: #0b0b0c;
+$card: #141416;
+$gold: #d4af37;
+$muted: #8b8b8f;
+$accent: #2a2a2f;
+$danger: #e05454;
+$ok: #26a269;
+
+:host { display: block; color: #eee; }
+
+.week-toolbar {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  margin: 12px 0 16px;
+  .title { font-weight: 600; letter-spacing: .4px; }
+  .btn-nav {
+    background: $card; border: 1px solid $accent; color: #eee;
+    padding: 6px 10px; border-radius: 10px; cursor: pointer;
+    &:hover { border-color: $gold; color: $gold; }
+  }
+}
+
+.notice { margin: 8px 0; color: $danger; }
+
+.grid {
+  display: grid;
+  grid-template-columns: 120px repeat(6, 1fr);
+  gap: 6px;
+  .header {
+    background: $card; border: 1px solid $accent; padding: 10px; border-radius: 12px;
+    text-align: center; font-weight: 600; color: $gold;
+  }
+  .row { display: contents; }
+  .col {
+    background: $card; border: 1px solid $accent; min-height: 42px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    &.rowtime { font-variant-numeric: tabular-nums; color: $muted; background: transparent; border: none; }
+    &.cell {
+      cursor: pointer; position: relative; transition: border-color .2s ease;
+      &:hover { border-color: $gold; }
+      &.empty { background: transparent; border: none; cursor: default; }
+      &.busy { background: rgba($danger, .08); border-color: rgba($danger, .4); }
+      &.free { background: rgba($ok, .06); border-color: rgba($ok, .4); }
+      .slot-label { font-size: .88rem; color: #bfe8bf; }
+      .slot-booked { font-size: .88rem; color: #ffb3b3; }
+    }
+  }
+}
+
+/* Modal */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5);
+}
+.modal {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: min(760px, 92vw); background: $card; border: 1px solid $accent; border-radius: 16px;
+  box-shadow: 0 10px 50px rgba(0,0,0,.6); padding: 14px;
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
+  h3 { margin: 0; color: $gold; }
+  .btn-close { background: transparent; border: none; color: #ddd; font-size: 20px; cursor: pointer;
+    &:hover { color: $gold; }
+  }
+}
+.form-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 16px; margin-top: 6px;
+  label { display: flex; flex-direction: column; gap: 6px; font-size: .92rem; }
+  .full { grid-column: 1 / -1; }
+  input, select, textarea {
+    background: #0e0f11; border: 1px solid $accent; color: #eee; border-radius: 10px; padding: 8px 10px;
+    &:focus { outline: none; border-color: $gold; }
+  }
+}
+.actions {
+  display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;
+  .btn-primary, .btn-secondary, .btn-danger {
+    padding: 8px 12px; border-radius: 10px; border: 1px solid transparent; cursor: pointer;
+  }
+  .btn-primary { background: $gold; color: #111; font-weight: 600; }
+  .btn-secondary { background: transparent; border-color: $accent; color: #ddd; }
+  .btn-danger { background: rgba($danger, .15); border-color: rgba($danger, .4); color: #ffb3b3; }
+}
+
+/* Conflict box */
+.conflict {
+  margin-top: 10px; padding: 10px; border: 1px dashed rgba($danger, .5); border-radius: 12px; background: rgba($danger, .05);
+  .conflict-title { color: #ffb3b3; font-weight: 700; margin-bottom: 6px; }
+  .suggerimento { color: #ffd2d2; }
+}
