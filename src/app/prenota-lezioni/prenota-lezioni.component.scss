@@ -478,3 +478,59 @@ $ok: #26a269;
     text-align: center;
   }
 }
+
+/* -------- Privacy Modal -------- */
+
+.privacy-modal-wrapper {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(3px);
+  z-index: 20000;       /* sopra tutto */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.privacy-modal {
+  background: #111;
+  color: #eee;
+  width: 90%;
+  max-width: 480px;
+  padding: 2rem;
+  border-radius: 14px;
+  border: 1px solid #333;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+}
+
+.privacy-modal h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #d4af37;
+  font-size: 1.6rem;
+}
+
+.privacy-text {
+  font-size: 0.95rem;
+  color: #ccc;
+  margin-bottom: 1.6rem;
+  line-height: 1.5;
+}
+
+/* bottone già nello stile del sito */
+.privacy-modal .btn-primary {
+  background: #d4af37;
+  color: #111;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s;
+}
+
+.privacy-modal .btn-primary:hover {
+  opacity: 0.85;
+}
+

@@ -1,0 +1,30 @@
+<div class="rifiuta-wrapper">
+  <div class="rifiuta-content">
+    <h1 class="rifiuta-title">Rifiuta prenotazione</h1>
+
+    <!-- Stato caricamento -->
+    <p *ngIf="loading" class="rifiuta-status">
+      Stiamo elaborando la tua richiesta, ti preghiamo di attendere qualche istante...
+    </p>
+
+    <!-- Messaggio finale -->
+    <p
+      *ngIf="!loading"
+      class="-message"
+      [ngClass]="{ 'success': isSuccess === true, 'error': isSuccess === false }"
+    >
+      <ng-container *ngIf="isSuccess === true">
+        <span class="rifiuta-main">
+          La lezione è stata rifiutata correttamente.
+        </span>
+        <br />
+      </ng-container>
+
+      <!-- Qui mostriamo il messaggio restituito dal backend -->
+      <span class="rifiuta-detail">
+        {{ responseMessage }}
+      </span>
+    </p>
+
+  </div>
+</div>

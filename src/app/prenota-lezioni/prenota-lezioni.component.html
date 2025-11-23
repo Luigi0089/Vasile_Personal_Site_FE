@@ -6,6 +6,23 @@
   <button (click)="goNextWeek()" class="btn-nav">›</button>
 </div>
 
+<!-- Privacy Modal -->
+<div class="privacy-modal-wrapper" *ngIf="privacyModalOpen">
+  <div class="privacy-modal">
+    <h2>Informativa sulla Privacy</h2>
+
+    <div class="privacy-text">
+      <!-- Qui metterai tu il testo -->
+      <p>[Testo privacy da inserire]</p>
+    </div>
+
+    <button class="btn-primary" (click)="acceptPrivacy()">
+      Accetto e procedo
+    </button>
+  </div>
+</div>
+
+
 <div class="notice" *ngIf="errorMsg">{{ errorMsg }}</div>
 
 <div class="grid" *ngIf="grid.length">
@@ -31,7 +48,7 @@
         <ng-container *ngIf="dayCol[r] as s">
           <div class="slot-label" *ngIf="!s.busy">Libero</div>
           <div class="slot-booked" *ngIf="s.busy">
-            {{ s.bookedBy?.nomeStudente || 'Prenotato' }}
+            {{ 'Prenotato' }}
           </div>
         </ng-container>
       </div>

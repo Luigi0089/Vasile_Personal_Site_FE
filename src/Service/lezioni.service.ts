@@ -28,4 +28,6 @@ export class LezioniService {
   annullaLezione(body: LezioneRequestDto): Observable<LezioneResponseDto> {
     return this.http.put<LezioneResponseDto>(`${this.BASE}/annulla`, body);
   }
+
+
 }

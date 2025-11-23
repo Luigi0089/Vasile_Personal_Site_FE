@@ -59,6 +59,8 @@ export class PrenotaLezioniComponent implements OnInit {
 
   timeOptions: string[] = [];
 
+  privacyModalOpen = false;
+
 
   form = this.fb.group({
     id: [null as string | number | null],
@@ -83,13 +85,13 @@ export class PrenotaLezioniComponent implements OnInit {
 
 
   livelli = [
-    { value: 'ELEMENTARE', label: 'Elementare' },
-    { value: 'MEDIE',      label: 'Medie' },
-    { value: 'SUPERIORI',  label: 'Superiori' },
-    { value: 'UNIVERSITA', label: 'Università' }
+    { value: 'Elementare', label: 'Elementare' },
+    { value: 'Medie',      label: 'Medie' },
+    { value: 'Superiori',  label: 'Superiori' },
+    { value: 'Universitario', label: 'Universitario' }
   ];
 
-  constructor(private fb: FormBuilder, private api: LezioniService) {}
+  constructor(private fb: FormBuilder, private lezioniService: LezioniService) {}
 
   ngOnInit(): void {
     const now = new Date();
@@ -106,6 +108,14 @@ export class PrenotaLezioniComponent implements OnInit {
       : now;              // giorno corrente
 
     this.goToWeek(anchor);
+
+    // Mostra privacy SOLO lato browser
+    if (typeof window !== 'undefined') {
+      const accepted = localStorage.getItem('privacy-lezioni-accepted');
+      if (!accepted) {
+        this.privacyModalOpen = true;
+      }
+    }
   }
 
   private buildTimeOptions(): void {
@@ -146,7 +156,7 @@ export class PrenotaLezioniComponent implements OnInit {
 
     const queryDate = format(anchor, 'yyyy-MM-dd');
 
-    this.api.getLezioniSettimana(queryDate)
+    this.lezioniService.getLezioniSettimana(queryDate)
       .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: (lez) => {
@@ -243,7 +253,7 @@ export class PrenotaLezioniComponent implements OnInit {
       nomeStudente: '',
       email: '',
       materia: '',
-      livello: 'UNIVERSITA',
+      livello: 'Universitario',
       note: '',
       dataLezione: slot.dayISO,
       orarioInizio: slot.start,  // es. "18:00:00"
@@ -320,8 +330,8 @@ export class PrenotaLezioniComponent implements OnInit {
     };
 
     const obs = this.isEdit && request.id
-      ? this.api.modificaLezione(request.id, request)
-      : this.api.creaLezione(request);
+      ? this.lezioniService.modificaLezione(request.id, request)
+      : this.lezioniService.creaLezione(request);
 
     this.loading = true;
 
@@ -372,7 +382,7 @@ export class PrenotaLezioniComponent implements OnInit {
 
     this.loading = true;
 
-    this.api.annullaLezione( body)
+    this.lezioniService.annullaLezione( body)
       .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: () => {
@@ -417,6 +427,10 @@ export class PrenotaLezioniComponent implements OnInit {
   }
 
 
+  acceptPrivacy(): void {
+    localStorage.setItem('privacy-lezioni-accepted', 'true');
+    this.privacyModalOpen = false;
+  }
 
 
 }

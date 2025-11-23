@@ -1,0 +1,30 @@
+<div class="accettazione-wrapper">
+  <div class="accettazione-content">
+    <h1 class="accettazione-title">Conferma prenotazione</h1>
+
+    <!-- Stato caricamento -->
+    <p *ngIf="loading" class="accettazione-status">
+      Stiamo elaborando la tua richiesta, ti preghiamo di attendere qualche istante...
+    </p>
+
+    <!-- Messaggio finale -->
+    <p
+      *ngIf="!loading"
+      class="accettazione-message"
+      [ngClass]="{ 'success': isSuccess === true, 'error': isSuccess === false }"
+    >
+      <ng-container *ngIf="isSuccess === true">
+        <span class="accettazione-main">
+          La lezione è stata confermata correttamente.
+        </span>
+        <br />
+      </ng-container>
+
+      <!-- Qui mostriamo il messaggio restituito dal backend -->
+      <span class="accettazione-detail">
+        {{ responseMessage }}
+      </span>
+    </p>
+
+  </div>
+</div>
