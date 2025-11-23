@@ -1,30 +1,40 @@
-/* --- Footer: patch minimale, non rompe lo schema --- */
+/* --- Footer --- */
 .site-footer {
   background: #000;
   color: #fff;
-  padding: 40px 20px;
-
+  padding: 24px 20px 20px;
+  width: 100%;
+  margin-top: 0;          /* 👈 permette al footer di stare in fondo se il parent è flex column */
+  box-sizing: border-box;
 }
 
-/* griglia e padding coerenti */
+/* layout responsivo */
 .footer-container {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
   display: flex;
-  justify-content: space-between; /* brand a sx, contatti a dx */
+  justify-content: space-between;  /* brand a sx, contatti a dx */
   align-items: flex-start;
   gap: 2rem;
-  flex-wrap: wrap; /* mobile-friendly */
+  flex-wrap: wrap;                 /* mobile-friendly */
 
-  @media (max-width: 960px) { grid-template-columns: 1fr 1fr; }
-  @media (max-width: 640px) { grid-template-columns: 1fr; text-align: center; }
+  @media (max-width: 960px) {
+    justify-content: center;       /* centra un po' le colonne su tablet */
+  }
+
+  @media (max-width: 640px) {
+    flex-direction: column;        /* colonne una sotto l’altra su mobile */
+    align-items: center;
+    text-align: center;
+  }
 }
 
 /* logo e bio compatti */
 .brand .logo {
   display: inline-grid;
   place-items: center;
-  width: 44px; height: 44px;
+  width: 44px;
+  height: 44px;
   border: 1px solid #d4af37;
   border-radius: 10px;
   color: #d4af37;
@@ -32,6 +42,7 @@
   letter-spacing: .5px;
   margin-bottom: .6rem;
 }
+
 .brand .bio {
   font-size: .95rem;
   line-height: 1.6;
@@ -49,7 +60,7 @@
   color: #fff;
 }
 
-/* niente pallini, spaziatura sobria */
+/* liste contatti / link */
 .links ul,
 .contact-list {
   list-style: none;
@@ -61,10 +72,14 @@
     align-items: center;
     margin-bottom: 0.5rem;
 
+    @media (max-width: 640px) {
+      justify-content: center;
+    }
+
     a {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem; /* spazio tra icona e testo */
+      gap: 0.5rem;  /* spazio tra icona e testo */
       color: inherit;
       text-decoration: none;
 
@@ -83,7 +98,9 @@
 }
 
 .links li + li,
-.contact-list li + li { margin-top: .5rem; }
+.contact-list li + li {
+  margin-top: .5rem;
+}
 
 /* link bianchi, oro in hover, senza underline */
 .site-footer a,
@@ -93,46 +110,18 @@
   color: #fff;
   text-decoration: none;
 }
+
 .site-footer a:hover,
-.site-footer a:focus-visible { color: #d4af37; }
-
-/* social */
-.social { display: flex; gap: .5rem; margin-top: 1rem; }
-@media (max-width: 640px) { .social { justify-content: center; } }
-.icon-btn {
-  width: 36px; height: 36px;
-  border: 1px solid rgba(255,255,255,.2);
-  border-radius: 10px;
-  display: inline-flex; align-items: center; justify-content: center;
-  background: transparent;
-  transition: transform .15s ease, border-color .2s ease;
+.site-footer a:focus-visible {
+  color: #d4af37;
 }
-.icon-btn svg { width: 18px; height: 18px; fill: #fff; }
-.icon-btn:hover { transform: translateY(-2px); border-color: #d4af37; }
 
-/* riga finale */
-.footer-bottom {
-  border-top: 1px solid rgba(255,255,255,.2);
-  margin-top: 2rem;
-  padding: 1rem 1.25rem;
-  display: flex; align-items: center; justify-content: center; gap: .75rem;
-  font-size: .95rem;
-}
-.to-top {
-  border: 1px solid rgba(255,255,255,.2);
-  background: transparent; color: #fff;
-  border-radius: 999px;
-  width: 34px; height: 34px;
-  line-height: 0; font-size: 1.1rem; cursor: pointer;
-  transition: border-color .2s ease, transform .15s ease;
-}
-.to-top:hover { border-color: #d4af37; transform: translateY(-1px); }
-.copy { color: #fff; }
-
+/* social a colonna (come nello screenshot) */
 .social-icons {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: .6rem;
 
   a {
     display: flex;
@@ -155,6 +144,7 @@
 
     &:hover {
       border-color: #ffd700;
+
       svg {
         fill: #ffd700; /* dorato al passaggio */
       }
@@ -162,3 +152,37 @@
   }
 }
 
+/* riga finale */
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,.2);
+  margin-top: 2rem;
+  padding: 1rem 1.25rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  font-size: .95rem;
+  flex-wrap: wrap;
+}
+
+.to-top {
+  border: 1px solid rgba(255,255,255,.2);
+  background: transparent;
+  color: #fff;
+  border-radius: 999px;
+  width: 34px;
+  height: 34px;
+  line-height: 0;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: border-color .2s ease, transform .15s ease;
+}
+
+.to-top:hover {
+  border-color: #d4af37;
+  transform: translateY(-1px);
+}
+
+.copy {
+  color: #fff;
+}

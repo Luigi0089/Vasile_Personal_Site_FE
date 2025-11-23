@@ -19,14 +19,15 @@
   <ng-container *ngFor="let rowIdx of grid[0]; let r = index">
     <div class="row">
       <div class="col rowtime">
-        {{ grid[0][r]?.label }}
+        {{ grid[0][r].label }}
       </div>
       <div class="col cell"
            *ngFor="let dayCol of grid; let c = index"
            [class.empty]="!dayCol[r]"
-           [class.busy]="dayCol[r]?.busy"
-           [class.free]="dayCol[r] && !dayCol[r].busy"
-           (click)="dayCol[r]?.busy ? onClickBusy(dayCol[r]) : onClickFree(dayCol[r])">
+           [class.busy]="dayCol[r].busy"
+           [class.free]="dayCol[r] && !dayCol[r].busy && !isPastSlot(dayCol[r])"
+           [class.past]="dayCol[r] && isPastSlot(dayCol[r])"
+           (click)="dayCol[r] && !isPastSlot(dayCol[r]) && (dayCol[r].busy ? onClickBusy(dayCol[r]) : onClickFree(dayCol[r]))">
         <ng-container *ngIf="dayCol[r] as s">
           <div class="slot-label" *ngIf="!s.busy">Libero</div>
           <div class="slot-booked" *ngIf="s.busy">
@@ -39,69 +40,238 @@
 </div>
 
 <!-- MODALE -->
-<div class="modal-backdrop" *ngIf="modalOpen" (click)="closeModal()"></div>
-<div class="modal" *ngIf="modalOpen">
-  <div class="modal-header">
-    <h3>{{ isEdit ? 'Modifica lezione' : 'Prenota lezione' }}</h3>
-    <button class="btn-close" (click)="closeModal()">✕</button>
-  </div>
+<div class="lezione-modal-wrapper" *ngIf="modalOpen">
+  <div class="lezione-modal-backdrop" (click)="closeModal()"></div>
 
-  <form [formGroup]="form" (ngSubmit)="submit()">
-    <div class="form-grid">
-      <label>Studente
-        <input formControlName="nomeStudente" placeholder="Mario Rossi">
-      </label>
+  <div class="lezione-modal" (click)="$event.stopPropagation()">
+    <div class="modal-title">
+      <h3>{{ isEdit ? 'Modifica lezione' : 'Prenota lezione' }}</h3>
 
-      <label>Materia
-        <input formControlName="materia" placeholder="Analisi 1">
-      </label>
-
-      <label>Livello
-        <select formControlName="livello">
-          <option *ngFor="let l of livelli" [value]="l.value">{{ l.label }}</option>
-        </select>
-      </label>
-
-      <label>Data
-        <input formControlName="dataLezione" type="date">
-      </label>
-
-      <label>Inizio
-        <input formControlName="orarioInizio" type="time" step="1800">
-      </label>
-
-      <label>Fine
-        <input formControlName="orarioFine" type="time" step="1800">
-      </label>
-
-      <label class="full">Note
-        <textarea formControlName="note" rows="2" placeholder="Preferisco esercizi sui limiti"></textarea>
-      </label>
-
-      <label class="full" *ngIf="isEdit">Codice modifica
-        <input formControlName="codiceModifica" placeholder="Inserisci il codice di modifica">
-      </label>
     </div>
 
-    <!-- conflitto con suggerimenti -->
-    <div class="conflict" *ngIf="conflict as c">
-      <div class="conflict-title">Conflitto</div>
-      <div class="conflict-msg">{{ c.message }}</div>
-      <div class="conflict-slots" *ngIf="c.fasceDisponibili?.length">
-        <div class="suggerimento" *ngFor="let f of c.fasceDisponibili">
-          Suggerimento: {{ f.orarioInizio }} – {{ f.orarioFine }}
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-grid">
+        <div class="form-grid">
+
+          <!-- Studente -->
+          <div class="form-field">
+            <label>Username</label>
+            <input
+              formControlName="nomeStudente"
+              placeholder="Mario Rossi"
+              [ngClass]="{ 'field-error': showError('nomeStudente') }"
+            >
+            <div class="error-msg" *ngIf="showError('nomeStudente')">
+              Il nome dello studente è obbligatorio.
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-field">
+            <label>Email</label>
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="es. mario.rossi@gmail.com"
+              [ngClass]="{ 'field-error': showError('email') }"
+            >
+            <div class="error-msg" *ngIf="showError('email')">
+              L'email è obbligatoria e deve essere valida.
+            </div>
+          </div>
+
+          <!-- Materia -->
+          <div class="form-field">
+            <label>Materia</label>
+            <input
+              formControlName="materia"
+              placeholder="Analisi 1"
+              [ngClass]="{ 'field-error': showError('materia') }"
+            >
+            <div class="error-msg" *ngIf="showError('materia')">
+              La materia è obbligatoria.
+            </div>
+          </div>
+
+          <!-- Livello -->
+          <div class="form-field">
+            <label>Livello</label>
+            <select
+              formControlName="livello"
+              [ngClass]="{ 'field-error': showError('livello') }"
+            >
+              <option *ngFor="let l of livelli" [value]="l.value">{{ l.label }}</option>
+            </select>
+            <div class="error-msg" *ngIf="showError('livello')">
+              Il livello è obbligatorio.
+            </div>
+          </div>
+
+          <!-- Data -->
+          <div class="form-field">
+            <label>Data</label>
+            <input
+              formControlName="dataLezione"
+              type="date"
+              [ngClass]="{ 'field-error': showError('dataLezione') }"
+            >
+            <div class="error-msg" *ngIf="showError('dataLezione')">
+              La data è obbligatoria.
+            </div>
+          </div>
+
+          <!-- Inizio -->
+          <div class="form-field">
+            <label>Inizio</label>
+            <select
+              formControlName="orarioInizio"
+              [ngClass]="{ 'field-error': showError('orarioInizio') }">
+              <option value="" disabled>Seleziona orario</option>
+              <option *ngFor="let t of timeOptions" [value]="t + ':00'">
+                {{ t }}
+              </option>
+            </select>
+            <div class="error-msg" *ngIf="showError('orarioInizio')">
+              L'orario di inizio è obbligatorio.
+            </div>
+          </div>
+
+
+          <!-- Fine -->
+          <div class="form-field">
+            <label>Fine</label>
+            <select
+              formControlName="orarioFine"
+              [ngClass]="{ 'field-error': showError('orarioFine') }">
+              <option value="" disabled>Seleziona orario</option>
+              <option *ngFor="let t of timeOptions" [value]="t + ':00'">
+                {{ t }}
+              </option>
+            </select>
+            <div class="error-msg" *ngIf="showError('orarioFine')">
+              L'orario di fine è obbligatorio.
+            </div>
+          </div>
+
+
+          <!-- Note (non obbligatorie) -->
+          <div class="form-field full">
+            <label>Note</label>
+            <textarea
+              formControlName="note"
+              rows="2"
+              placeholder="Preferisco esercizi sui limiti"
+            ></textarea>
+          </div>
+
+          <!-- Codice modifica (solo in edit) -->
+          <div class="form-field full" *ngIf="isEdit">
+            <label>Codice modifica</label>
+            <input
+              formControlName="codiceModifica"
+              placeholder="Inserisci il codice di modifica"
+              [ngClass]="{ 'field-error': showError('codiceModifica') }"
+            >
+            <div class="error-msg" *ngIf="showError('codiceModifica')">
+              Il codice di modifica è obbligatorio per modificare la lezione.
+            </div>
+          </div>
+
+        </div>
+
+
+        <label class="form-field full" *ngIf="isEdit">Codice modifica
+          <input formControlName="codiceModifica" placeholder="Inserisci il codice di modifica">
+        </label>
+      </div>
+
+      <!-- conflitto con suggerimenti -->
+      <div class="conflict" *ngIf="conflict as c">
+        <div class="conflict-title">Conflitto</div>
+        <div class="conflict-msg">{{ c.message }}</div>
+        <div class="conflict-slots" *ngIf="c.fasceDisponibili?.length">
+          <div class="suggerimento" *ngFor="let f of c.fasceDisponibili">
+            Suggerimento: {{ f.orarioInizio }} – {{ f.orarioFine }}
+          </div>
         </div>
       </div>
+
+      <div class="actions">
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="loading || form.invalid"
+          [ngClass]="{ 'btn-disabled': loading || form.invalid }">
+          {{ isEdit ? 'Salva modifiche' : 'Prenota' }}
+        </button>
+
+        <button
+          type="button"
+          class="btn-secondary"
+          (click)="closeModal()">
+          Annulla
+        </button>
+
+        <button
+          type="button"
+          class="btn-danger"
+          *ngIf="isEdit && form.value.id"
+          [disabled]="loading || form.invalid"
+          [ngClass]="{ 'btn-disabled': loading || form.invalid }"
+          (click)="annulla(form.value.id!)">
+          Annulla lezione
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- MODALE SUCCESSO -->
+<div class="lezione-success-wrapper" *ngIf="successModalOpen">
+  <div class="lezione-success-backdrop" (click)="closeSuccessModal()"></div>
+
+  <div class="lezione-success-modal" (click)="$event.stopPropagation()">
+    <div class="lezione-success-header">
+      <h3>Prenotazione confermata</h3>
+      <button  class="lezione-success-close" (click)="closeSuccessModal()">✕</button>
     </div>
 
-    <div class="actions">
-      <button type="submit" class="btn-primary" [disabled]="form.invalid">
-        {{ isEdit ? 'Salva modifiche' : 'Prenota' }}
-      </button>
-      <button type="button" class="btn-secondary" (click)="closeModal()">Annulla</button>
-      <button type="button" class="btn-danger" *ngIf="isEdit && form.value.id" (click)="annulla(form.value.id!)">
-        Annulla lezione
-      </button>
+    <div class="success-body" *ngIf="lastBooking as b">
+      <p>La tua lezione è stata prenotata correttamente 🎉</p>
+
+      <ul class="riepilogo">
+        <li><strong>Studente:</strong> {{ b.nomeStudente }}</li>
+        <li><strong>Materia:</strong> {{ b.materia }}</li>
+        <li><strong>Livello:</strong> {{ b.livello }}</li>
+        <li><strong>Data:</strong> {{ b.dataLezione }}</li>
+        <li><strong>Orario:</strong> {{ b.orarioInizio }} – {{ b.orarioFine }}</li>
+      </ul>
+
+      <div class="codice-modifica-box" *ngIf="b.codiceModifica">
+        <div class="label">
+          Questo è il tuo <strong>codice di modifica</strong>.<br>
+          <span>Conservalo con cura: ti servirà per modificare o annullare la lezione.</span>
+        </div>
+        <div class="codice">
+          {{ b.codiceModifica }}
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn-primary" (click)="closeSuccessModal()">
+          Ho salvato il codice
+        </button>
+      </div>
     </div>
-  </form>
+  </div>
 </div>
+
+<!-- Overlay di caricamento -->
+<div class="loading-overlay" *ngIf="loading">
+  <div class="loading-spinner"></div>
+</div>
+
+
+
+

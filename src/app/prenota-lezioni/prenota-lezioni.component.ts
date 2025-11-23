@@ -1,44 +1,45 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
-import { addDays, format, startOfWeek, endOfWeek } from 'date-fns';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { addDays, format, startOfWeek } from 'date-fns';
 import { it } from 'date-fns/locale';
-import { LezioniService, PrenotazioneLezione, ConflictResponse } from '../services/lezioni.service';
 import { finalize } from 'rxjs/operators';
 
-@Component({
-  selector: 'app-prenota-lezioni',
-  standalone: true,
-  imports: [],
-  templateUrl: './prenota-lezioni.component.html',
-  styleUrl: './prenota-lezioni.component.scss'
-})
+import { LezioniService } from '../../Service/lezioni.service';
+import { LezioneRequestDto } from '../../DTO/LezioneRequestDto';
+import { LezioneResponseDto } from '../../DTO/LezioneResponseDto';
+import { ConflictResponse } from '../../DTO/ConflictResponse';
+
+// ---- TIPI ----
 type Slot = {
-  dayISO: string;         // yyyy-MM-dd
-  label: string;          // HH:mm
-  start: string;          // HH:mm:ss
-  end: string;            // HH:mm:ss
+  dayISO: string;             // yyyy-MM-dd
+  label: string;              // HH:mm
+  start: string;              // HH:mm:ss
+  end: string;                // HH:mm:ss
   busy: boolean;
-  bookedBy?: PrenotazioneLezione; // se occupato
+  bookedBy?: LezioneResponseDto; // se occupato
 };
 
 @Component({
   selector: 'app-prenota-lezioni',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './prenota-lezioni.component.html',
   styleUrls: ['./prenota-lezioni.component.scss']
 })
 export class PrenotaLezioniComponent implements OnInit {
 
-  // Config orari: Lun–Ven 18–21; Sabato 09–20 (UI comoda), Domenica esclusa
+  // Config orari: Lun–Ven 18–21; Sabato 09–20, Domenica esclusa
   readonly SLOT_MINUTES = 30;
   readonly WEEKDAY_RANGE = { start: '18:00:00', end: '21:00:00' };
-  readonly SAT_RANGE = { start: '09:00:00', end: '20:00:00' };
+  readonly SAT_RANGE = { start: '18:00:00', end: '21:00:00' };
 
   today = new Date();
   weekStart!: Date; // lunedì
   weekEnd!: Date;   // sabato
   daysISO: string[] = []; // yyyy-MM-dd, lun→sab
   grid: Slot[][] = [];    // [colonna giorno][riga slot]
-  lezioni: PrenotazioneLezione[] = [];
+  lezioni: LezioneResponseDto[] = [];
   loading = false;
   errorMsg = '';
 
@@ -47,17 +48,39 @@ export class PrenotaLezioniComponent implements OnInit {
   isEdit = false;
   conflict?: ConflictResponse;
 
+  successModalOpen = false;
+  lastBooking?: LezioneResponseDto;
+
+  todayISO!: string;
+
+  submitted = false;
+
+  isLoading = false;
+
+  timeOptions: string[] = [];
+
+
   form = this.fb.group({
-    id: [null],
+    id: [null as string | number | null],
     nomeStudente: ['', Validators.required],
+    email: ['', [Validators.required, Validators.email]],
     materia: ['', Validators.required],
     livello: ['UNIVERSITA', Validators.required],
     note: [''],
-    dataLezione: ['', Validators.required],   // yyyy-MM-dd
-    orarioInizio: ['', Validators.required],  // HH:mm:ss
-    orarioFine: ['', Validators.required],    // HH:mm:ss
-    codiceModifica: [''] // richiesto in modifica
+    dataLezione: ['', Validators.required],
+    orarioInizio: ['', Validators.required],
+    orarioFine: ['', Validators.required],
+    codiceModifica: ['']
   });
+
+
+  showError(controlName: string): boolean {
+    const control = this.form.get(controlName);
+    return !!control &&
+      control.invalid &&
+      (control.touched || this.submitted);
+  }
+
 
   livelli = [
     { value: 'ELEMENTARE', label: 'Elementare' },
@@ -69,7 +92,36 @@ export class PrenotaLezioniComponent implements OnInit {
   constructor(private fb: FormBuilder, private api: LezioniService) {}
 
   ngOnInit(): void {
-    this.goToWeek(this.today);
+    const now = new Date();
+
+    // salvo comunque "oggi" per i controlli sui past slot
+    this.today = now;
+    this.todayISO = format(now, 'yyyy-MM-dd');
+
+    this.buildTimeOptions();
+
+    // Se è domenica (0), parti dalla settimana successiva (lunedì dopo)
+    const anchor = now.getDay() === 0
+      ? addDays(now, 1)   // lunedì successivo
+      : now;              // giorno corrente
+
+    this.goToWeek(anchor);
+  }
+
+  private buildTimeOptions(): void {
+    const startHour = 18;
+    const endHour = 21;
+    const stepMinutes = 30;
+
+    const opts: string[] = [];
+    for (let h = startHour; h < endHour; h++) {
+      for (let m = 0; m < 60; m += stepMinutes) {
+        const hh = h.toString().padStart(2, '0');
+        const mm = m.toString().padStart(2, '0');
+        opts.push(`${hh}:${mm}`); // es. "18:00"
+      }
+    }
+    this.timeOptions = opts;
   }
 
   goPrevWeek(): void {
@@ -83,14 +135,17 @@ export class PrenotaLezioniComponent implements OnInit {
   goToWeek(anchor: Date): void {
     this.loading = true;
     this.errorMsg = '';
+
     this.weekStart = startOfWeek(anchor, { weekStartsOn: 1 }); // lun
     // prendi sabato come fine (non domenica)
     this.weekEnd = addDays(this.weekStart, 5); // lun + 5 = sab
+
     this.daysISO = Array.from({ length: 6 }, (_, i) =>
       format(addDays(this.weekStart, i), 'yyyy-MM-dd')
     );
 
     const queryDate = format(anchor, 'yyyy-MM-dd');
+
     this.api.getLezioniSettimana(queryDate)
       .pipe(finalize(() => this.loading = false))
       .subscribe({
@@ -106,13 +161,13 @@ export class PrenotaLezioniComponent implements OnInit {
   }
 
   private buildGrid(): void {
-    // determina tutti gli slot della settimana
     const columns: Slot[][] = [];
 
     this.daysISO.forEach((dayISO, idx) => {
       const dateObj = addDays(this.weekStart, idx);
       const dow = dateObj.getDay(); // 0 dom, 6 sab
-      if (dow === 0) { // non usato (domenica esclusa)
+
+      if (dow === 0) { // domenica esclusa (anche se qui non ci arrivi mai con daysISO)
         columns.push([]);
         return;
       }
@@ -135,8 +190,8 @@ export class PrenotaLezioniComponent implements OnInit {
         const endHH = format(next, 'HH:mm:ss');
         const label = format(cur, 'HH:mm');
 
-        // è occupato se esiste lezione con overlap non banale
         const busyLesson = this.findOverlappingLesson(dayISO, startHH, endHH);
+
         slots.push({
           dayISO,
           label,
@@ -148,16 +203,20 @@ export class PrenotaLezioniComponent implements OnInit {
 
         cur = next;
       }
+
       columns.push(slots);
     });
 
     this.grid = columns;
   }
 
-  private findOverlappingLesson(dayISO: string, slotStart: string, slotEnd: string): PrenotazioneLezione | null {
+  private findOverlappingLesson(
+    dayISO: string,
+    slotStart: string,
+    slotEnd: string
+  ): LezioneResponseDto | null {
     // overlap se: existing.start < slotEnd && existing.end > slotStart
     return this.lezioni.find(l =>
-      !l.annullata &&
       l.dataLezione === dayISO &&
       l.orarioInizio < slotEnd &&
       l.orarioFine > slotStart
@@ -174,96 +233,190 @@ export class PrenotaLezioniComponent implements OnInit {
   onClickFree(slot: Slot): void {
     this.isEdit = false;
     this.conflict = undefined;
+    this.submitted = false;
+
+    this.clearCodiceModificaRequired();
+
+    // Valorizzo in modo sincrono il form
     this.form.reset({
       id: null,
       nomeStudente: '',
+      email: '',
       materia: '',
       livello: 'UNIVERSITA',
       note: '',
       dataLezione: slot.dayISO,
-      orarioInizio: slot.start,
-      orarioFine: slot.end,
+      orarioInizio: slot.start,  // es. "18:00:00"
+      orarioFine: slot.end,      // es. "18:30:00"
       codiceModifica: ''
     });
+
+    // Apro la modale SOLO dopo aver sistemato il form
     this.modalOpen = true;
   }
+
 
   // Click su slot OCCUPATO → apre form modifica (precaricato)
   onClickBusy(slot: Slot): void {
     const l = slot.bookedBy!;
     this.isEdit = true;
     this.conflict = undefined;
+    this.submitted = false;
+
+    this.setCodiceModificaRequired();
+
     this.form.reset({
-      id: l.id ?? null,
+      id: l.id,
       nomeStudente: l.nomeStudente,
+      email: l.email ?? '',
       materia: l.materia,
       livello: l.livello,
-      note: l.note,
+      note: l.note ?? '',
       dataLezione: l.dataLezione,
-      orarioInizio: l.orarioInizio,
+      orarioInizio: l.orarioInizio,   // deve combaciare con le <option> del select
       orarioFine: l.orarioFine,
-      codiceModifica: '' // l’utente lo inserirà
+      codiceModifica: ''             // lo inserisce l’utente
     });
+
     this.modalOpen = true;
   }
 
+
   closeModal(): void {
+    this.submitted = false;
     this.modalOpen = false;
   }
 
   submit(): void {
+    // reset errori precedenti
     this.errorMsg = '';
     this.conflict = undefined;
 
+    // se sta già inviando, evito doppi click
+    if (this.loading) {
+      return;
+    }
+
+    this.submitted = true;
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
     const v = this.form.getRawValue();
-    const body: PrenotazioneLezione = {
-      id: v.id ?? undefined,
+
+    const request: LezioneRequestDto = {
+      id: (v.id as string | null) ?? undefined,
       nomeStudente: v.nomeStudente!,
+      email: v.email!,
       materia: v.materia!,
       livello: v.livello!,
-      note: v.note ?? '',
+      note: v.note ?? null,
       dataLezione: v.dataLezione!,
       orarioInizio: v.orarioInizio!,
       orarioFine: v.orarioFine!,
       codiceModifica: v.codiceModifica ?? undefined
     };
 
-    const obs = this.isEdit && body.id != null
-      ? this.api.modificaLezione(body.id, body as any) // include codiceModifica
-      : this.api.creaLezione(body);
+    const obs = this.isEdit && request.id
+      ? this.api.modificaLezione(request.id, request)
+      : this.api.creaLezione(request);
 
     this.loading = true;
-    obs.pipe(finalize(() => this.loading = false)).subscribe({
-      next: () => {
-        this.closeModal();
-        this.goToWeek(this.weekStart); // refresh
-      },
-      error: (err) => {
-        // se 409, mostra suggerimenti di fasce disponibili
-        if (err?.status === 409 && err?.error) {
-          this.conflict = err.error as ConflictResponse;
-        } else {
-          this.errorMsg = 'Errore durante il salvataggio della lezione.';
+
+    obs
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+        })
+      )
+      .subscribe({
+        next: (res) => {
+          this.closeModal();
+          this.openSuccessModal(res);
+          this.goToWeek(this.weekStart);
+          this.submitted = false;
+        },
+        error: (err) => {
+          if (err?.status === 409 && err?.error) {
+            this.conflict = err.error as ConflictResponse;
+          } else {
+            this.errorMsg = 'Errore durante il salvataggio della lezione.';
+          }
+          console.error(err);
         }
-        console.error(err);
-      }
-    });
+      });
   }
 
-  annulla(id?: number | string): void {
-    if (!id) { return; }
+
+
+
+  annulla(id?: string | number): void {
+    if (!id) return;
+
+    const v = this.form.getRawValue();
+
+    const body: LezioneRequestDto = {
+      id: id.toString(),
+      nomeStudente: v.nomeStudente!,
+      email: v.email!,
+      materia: v.materia!,
+      livello: v.livello!,
+      note: v.note ?? null,
+      dataLezione: v.dataLezione!,
+      orarioInizio: v.orarioInizio!,
+      orarioFine: v.orarioFine!,
+      codiceModifica: v.codiceModifica ?? undefined
+    };
+
     this.loading = true;
-    this.api.annullaLezione(id)
+
+    this.api.annullaLezione( body)
       .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: () => {
           this.closeModal();
           this.goToWeek(this.weekStart);
         },
-        error: (err) => {
+        error: err => {
           this.errorMsg = 'Errore durante l’annullamento.';
           console.error(err);
         }
       });
   }
+
+  openSuccessModal(lezione: LezioneResponseDto): void {
+    this.lastBooking = lezione;
+    this.successModalOpen = true;
+  }
+
+  closeSuccessModal(): void {
+    this.successModalOpen = false;
+  }
+
+  isPastSlot(slot?: Slot): boolean {
+    if (!slot) { return false; }
+    // confronto stringhe nel formato yyyy-MM-dd → funziona lessicograficamente
+    return slot.dayISO < this.todayISO;
+  }
+
+
+  private setCodiceModificaRequired(): void {
+    const ctrl = this.form.get('codiceModifica');
+    if (!ctrl) return;
+  ctrl.setValidators([Validators.required]);
+  ctrl.updateValueAndValidity();
+  }
+
+  private clearCodiceModificaRequired(): void {
+    const ctrl = this.form.get('codiceModifica');
+    if (!ctrl) return;
+  ctrl.clearValidators();
+  ctrl.updateValueAndValidity();
+  }
+
+
+
+
 }

@@ -1,6 +1,15 @@
 :host {
-  display: block;
-  min-height: 100vh;
+  display: flex;                 /* 👈 fondamentale */
+  flex-direction: column;        /* layout verticale */
+  min-height: 100vh;             /* occupa tutta la viewport */
   background: linear-gradient(to bottom, #000 10%, #1a1a1a 100%);
   transition: all 0.3s ease;
+}
+
+.main-content {
+  flex: 1 0 auto;                /* prende lo spazio centrale */
+}
+
+app-footer {
+  flex-shrink: 0;                /* footer SEMPRE in fondo */
 }
