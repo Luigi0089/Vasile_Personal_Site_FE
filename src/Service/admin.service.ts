@@ -28,11 +28,7 @@ export class AdminService {
     });
   }
 
-  posticipaLezione(id: string): Observable<string> {
-    const params = new HttpParams().set('id', id);
-    return this.http.get(`${this.BASE}/posticipa`, {
-      params,
-      responseType: 'text'
-    });
+  wakeUp(): Observable<string> {
+    return this.http.get(`${this.BASE}/ping`, { responseType: 'text' });
   }
 }
