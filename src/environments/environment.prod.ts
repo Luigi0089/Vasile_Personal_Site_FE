@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  baseApiUrl: 'https://tuodominio.it/luigi/vasile/personal/api'
+  baseApiUrl:'https://vasilepersonalsitebe.onrender.com/luigi/vasile/personal/api'
 };
