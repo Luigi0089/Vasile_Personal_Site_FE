@@ -268,17 +268,26 @@
 </div>
 
 <!-- MODALE SUCCESSO -->
+<!-- MODALE SUCCESSO -->
 <div class="lezione-success-wrapper" *ngIf="successModalOpen">
   <div class="lezione-success-backdrop" (click)="closeSuccessModal()"></div>
 
   <div class="lezione-success-modal" (click)="$event.stopPropagation()">
     <div class="lezione-success-header">
       <h3>Prenotazione confermata</h3>
-      <button  class="lezione-success-close" (click)="closeSuccessModal()">✕</button>
+      <button class="lezione-success-close" (click)="closeSuccessModal()">✕</button>
     </div>
 
     <div class="success-body" *ngIf="lastBooking as b">
       <p>La tua lezione è stata prenotata correttamente 🎉</p>
+
+      <!-- AVVISO EMAIL / SPAM -->
+      <p class="mail-notice">
+        Ti abbiamo inviato un'email di riepilogo con tutti i dettagli della prenotazione.
+        Ti chiediamo gentilmente di controllare anche la cartella <strong>Spam</strong> o
+        <strong>Posta indesiderata</strong> per assicurarti di ricevere gli aggiornamenti
+        sullo stato della richiesta.
+      </p>
 
       <ul class="riepilogo">
         <li><strong>Studente:</strong> {{ b.nomeStudente }}</li>
@@ -286,6 +295,12 @@
         <li><strong>Livello:</strong> {{ b.livello }}</li>
         <li><strong>Data:</strong> {{ b.dataLezione }}</li>
         <li><strong>Orario:</strong> {{ b.orarioInizio }} – {{ b.orarioFine }}</li>
+
+        <!-- STATO DELLA RICHIESTA -->
+        <li>
+          <strong>Stato della richiesta:</strong>
+          {{ b.stato || 'In attesa di conferma da parte del docente' }}
+        </li>
       </ul>
 
       <div class="codice-modifica-box" *ngIf="b.codiceModifica">
@@ -306,6 +321,7 @@
     </div>
   </div>
 </div>
+
 
 <!-- Overlay di caricamento -->
 <div class="loading-overlay" *ngIf="loading">
