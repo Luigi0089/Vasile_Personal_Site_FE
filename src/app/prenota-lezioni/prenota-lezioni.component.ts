@@ -59,7 +59,7 @@ export class PrenotaLezioniComponent implements OnInit {
 
   timeOptions: string[] = [];
 
-  privacyModalOpen = true;
+  privacyModalOpen = false;
 
 
   form = this.fb.group({
@@ -112,9 +112,8 @@ export class PrenotaLezioniComponent implements OnInit {
     // Mostra privacy SOLO lato browser
     if (typeof window !== 'undefined') {
       const accepted = localStorage.getItem('privacy-lezioni-accepted');
-      if (!accepted) {
-        this.privacyModalOpen = false;
-      }
+      // se NON ha ancora accettato -> apri la modale
+      this.privacyModalOpen = !accepted;
     }
   }
 
@@ -439,10 +438,13 @@ export class PrenotaLezioniComponent implements OnInit {
   }
 
 
-  acceptPrivacy(): void {
-    localStorage.setItem('privacy-lezioni-accepted', 'true');
+  acceptPrivacy() {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('privacy-lezioni-accepted', 'true');
+    }
     this.privacyModalOpen = false;
   }
+
 
 
 }
