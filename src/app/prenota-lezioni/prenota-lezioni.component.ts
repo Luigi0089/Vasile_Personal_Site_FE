@@ -349,7 +349,19 @@ export class PrenotaLezioniComponent implements OnInit {
           this.submitted = false;
         },
         error: (err) => {
-          if (err?.status === 409 && err?.error) {
+
+          if (this.isEdit && err?.status === 400) {
+            const codiceCtrl = this.form.get('codiceModifica');
+            if (codiceCtrl) {
+              codiceCtrl.setErrors({
+                ...(codiceCtrl.errors || {}),
+                invalidCode: true
+              });
+              codiceCtrl.markAsTouched();
+            }
+            // niente messaggio generico, niente conflitto
+            return;
+          }else if (err?.status === 409 && err?.error) {
             this.conflict = err.error as ConflictResponse;
           } else {
             this.errorMsg = 'Errore durante il salvataggio della lezione.';

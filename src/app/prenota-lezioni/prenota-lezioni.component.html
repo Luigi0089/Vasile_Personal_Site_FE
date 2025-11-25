@@ -12,8 +12,23 @@
     <h2>Informativa sulla Privacy</h2>
 
     <div class="privacy-text">
-      <!-- Qui metterai tu il testo -->
-      <p>[Testo privacy da inserire]</p>
+      <p>
+        Ai sensi del Regolamento (UE) 2016/679 (“GDPR”) dichiaro di aver letto
+        l’informativa privacy e acconsento al trattamento dei miei dati personali
+        inseriti nel modulo al solo scopo di gestire la richiesta di prenotazione
+        della lezione e ricevere eventuali comunicazioni organizzative connesse.
+      </p>
+      <p>
+        I dati saranno conservati per il tempo strettamente necessario alla gestione
+        della richiesta e non saranno comunicati a terzi, salvo obblighi di legge.
+        Potrò in qualsiasi momento esercitare i diritti di accesso, rettifica,
+        cancellazione, limitazione e opposizione scrivendo a
+        <strong>prenotazionelezioneprivata&#64;gmail.com</strong>.
+      </p>
+      <p>
+        Ho preso visione dell’informativa completa disponibile al seguente link:
+        <a href="/privacy" target="_blank">Informativa Privacy completa</a>.
+      </p>
     </div>
 
     <button class="btn-primary" (click)="acceptPrivacy()">
@@ -21,6 +36,7 @@
     </button>
   </div>
 </div>
+
 
 
 <div class="notice" *ngIf="errorMsg">{{ errorMsg }}</div>
@@ -48,7 +64,7 @@
         <ng-container *ngIf="dayCol[r] as s">
           <div class="slot-label" *ngIf="!s.busy">Libero</div>
           <div class="slot-booked" *ngIf="s.busy">
-            {{ 'Prenotato' }}
+            {{ s.bookedBy?.materia  || 'Prenotato' }}
           </div>
         </ng-container>
       </div>
@@ -189,10 +205,21 @@
               placeholder="Inserisci il codice di modifica"
               [ngClass]="{ 'field-error': showError('codiceModifica') }"
             >
-            <div class="error-msg" *ngIf="showError('codiceModifica')">
+
+            <!-- Obbligatorio -->
+            <div class="error-msg"
+                 *ngIf="form.get('codiceModifica')?.hasError('required') && showError('codiceModifica')">
               Il codice di modifica è obbligatorio per modificare la lezione.
             </div>
+
+            <!-- Errato lato backend -->
+            <div class="error-msg"
+                 *ngIf="form.get('codiceModifica')?.hasError('invalidCode')
+              && !form.get('codiceModifica')?.hasError('required')">
+              Il codice di modifica inserito non è corretto.
+            </div>
           </div>
+
 
         </div>
 
