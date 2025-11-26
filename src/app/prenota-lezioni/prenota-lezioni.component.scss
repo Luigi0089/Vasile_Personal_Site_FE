@@ -51,8 +51,7 @@ $ok: #26a269;
   grid-template-columns: 120px repeat(6, 1fr);
   gap: 6px;
   margin-bottom: 1.5rem;
-
-  /* su schermi stretti permetto scroll orizzontale */
+  margin-inline: 1rem;
   overflow-x: auto;
   padding-bottom: 8px;
 
@@ -94,6 +93,9 @@ $ok: #26a269;
       position: relative;
       transition: border-color .2s ease;
 
+      /* 🔴 importante: non far uscire il contenuto dal box */
+      overflow: hidden;
+
       &:hover {
         border-color: $gold;
       }
@@ -122,6 +124,14 @@ $ok: #26a269;
       .slot-booked {
         font-size: .88rem;
         color: #ffb3b3;
+
+        /* 🔹 testo su una riga con puntini se troppo lungo */
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 0 .35rem;
+        text-align: center;
       }
     }
   }
@@ -131,6 +141,7 @@ $ok: #26a269;
   opacity: 0.35;
   cursor: not-allowed;
 }
+
 
 /* MODALE PRENOTAZIONE (wrapper e backdrop) */
 .lezione-modal-wrapper {
@@ -436,6 +447,13 @@ $ok: #26a269;
 }
 
 /* BREAKPOINTS RESPONSIVE */
+
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: 80px repeat(6, minmax(90px, 1fr));
+    margin-inline: 5rem ;
+  }
+}
 @media (max-width: 900px) {
   .grid {
     grid-template-columns: 80px repeat(6, minmax(90px, 1fr));
@@ -463,21 +481,23 @@ $ok: #26a269;
 }
 
 @media (max-width: 480px) {
-  .week-toolbar {
-    flex-wrap: wrap;
-    .title {
-      width: 100%;
-      text-align: center;
-    }
+  .grid {
+    /* do un po' più respiro alle colonne materia, tanto c'è già lo scroll orizzontale */
+    grid-template-columns: 70px repeat(6, minmax(110px, 1fr));
+    font-size: 0.8rem;
   }
 
-  .actions .btn-primary,
-  .actions .btn-secondary,
-  .actions .btn-danger {
-    width: 100%;
-    text-align: center;
+  .grid .col.cell .slot-booked,
+  .grid .col.cell .slot-label {
+    font-size: 0.78rem;
+  }
+
+  /* se hai nomi senza spazi (tipo "ProgrammazioneJavaSecondoSemestre") */
+  .grid .col.cell .slot-booked {
+    overflow-wrap: anywhere;
   }
 }
+
 
 /* -------- Privacy Modal -------- */
 

@@ -63,9 +63,12 @@
            (click)="dayCol[r] && !isPastSlot(dayCol[r]) && (dayCol[r].busy ? onClickBusy(dayCol[r]) : onClickFree(dayCol[r]))">
         <ng-container *ngIf="dayCol[r] as s">
           <div class="slot-label" *ngIf="!s.busy">Libero</div>
-          <div class="slot-booked" *ngIf="s.busy">
+          <div class="slot-booked"
+               *ngIf="s.busy"
+               [title]="s.bookedBy?.materia || 'Prenotato'">
             {{ s.bookedBy?.materia  || 'Prenotato' }}
           </div>
+
         </ng-container>
       </div>
     </div>

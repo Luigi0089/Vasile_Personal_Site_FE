@@ -1,7 +1,6 @@
-import { Component } from '@angular/core';
-import {NgIf} from "@angular/common";
-import {RouterLink, RouterLinkActive} from "@angular/router";
-import {Router} from "@angular/router";
+import { Component, ElementRef, ViewChild } from '@angular/core';
+import { NgIf } from '@angular/common';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -16,14 +15,33 @@ import {Router} from "@angular/router";
 })
 export class HeaderComponent {
 
+  @ViewChild('navbarCollapse') navbarCollapse!: ElementRef<HTMLElement>;
+  @ViewChild('navbarToggler') navbarToggler!: ElementRef<HTMLButtonElement>;
+
   dropdownOpen = false;
 
   constructor(private router: Router) {}
 
+  /**
+   * Chiude il menù a scomparsa (burger) sui dispositivi piccoli
+   */
+  closeNavbar(): void {
+    // navbar-expand-lg → sotto i 992px è collapsabile
+    if (window.innerWidth < 992 && this.navbarCollapse) {
+      const collapseEl = this.navbarCollapse.nativeElement;
+
+      // se per qualche motivo è aperta, la chiudo
+      if (collapseEl.classList.contains('show')) {
+        collapseEl.classList.remove('show');
+      }
+    }
+  }
+
   goToStackSection(fragment: string) {
     this.dropdownOpen = false;
+    this.closeNavbar();   // chiudo il menù dopo la scelta
 
-    // Vai a /stack prima
+    // Vai a /Stack prima
     this.router.navigate(['/Stack']).then(() => {
       // Dopo la navigazione, scrolla all'elemento
       const element = document.getElementById(fragment);
@@ -34,6 +52,4 @@ export class HeaderComponent {
       }
     });
   }
-
-
 }

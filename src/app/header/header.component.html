@@ -1,28 +1,47 @@
 <div class="container-fluid">
-  <nav class="navbar navbar-expand-lg  navbar-dark fixed-top">
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
 
-    <div class="container-fluid" >
-
-
-      <a class="navbar-brand" routerLink="/Home"  style="font-family:'Baskerville Old Face'">
-        <img width="40" src=Logo_rotondo.png alt="Logo" >
-
-
+      <a class="navbar-brand" routerLink="/Home" >
+        <img width="40" src="Logo_rotondo.png" alt="Logo">
       </a>
 
-
-
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <!-- aggiungo #navbarToggler -->
+      <button
+        #navbarToggler
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+      <!-- aggiungo #navbarCollapse -->
+      <div class="collapse navbar-collapse" id="navbarSupportedContent" #navbarCollapse>
         <ul class="navbar-nav mb-2 mb-lg-0">
+
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" routerLink="/Home"   routerLinkActive="active">Home</a>
+            <a
+              class="nav-link active"
+              aria-current="page"
+              routerLink="/Home"
+              routerLinkActive="active"
+              (click)="closeNavbar()"
+            >
+              Home
+            </a>
           </li>
 
           <li class="nav-item dropdown" (click)="$event.stopPropagation()">
-            <a class="nav-link d-inline-flex align-items-center active freccia" routerLink="/Stack"   routerLinkActive="active">
+            <a
+              class="nav-link d-inline-flex align-items-center active freccia"
+              routerLink="/Stack"
+              routerLinkActive="active"
+              (click)="closeNavbar()"
+            >
               Stack
             </a>
 
@@ -31,25 +50,40 @@
               type="button"
               class="dropdown-toggle-btn arrow"
               aria-expanded="false"
-              data-bs-toggle="dropdown"
-              >
+              data-bs-toggle="dropdown">
               ▼
             </button>
 
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" (click)="goToStackSection('frontend')">Frontend</a></li>
-                <li><a class="dropdown-item" (click)="goToStackSection('backend')">Backend</a></li>
-                <li><a class="dropdown-item" (click)="goToStackSection('database')">Database</a></li>
-                <li><a class="dropdown-item" (click)="goToStackSection('progetti')">Progetti</a></li>
-              </ul>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" (click)="goToStackSection('frontend'); closeNavbar()">Frontend</a></li>
+              <li><a class="dropdown-item" (click)="goToStackSection('backend'); closeNavbar()">Backend</a></li>
+              <li><a class="dropdown-item" (click)="goToStackSection('database'); closeNavbar()">Database</a></li>
+              <li><a class="dropdown-item" (click)="goToStackSection('progetti'); closeNavbar()">Progetti</a></li>
+            </ul>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" routerLink="/Skill"   routerLinkActive="active">Skill</a>
+            <a
+              class="nav-link active"
+              aria-current="page"
+              routerLink="/Skill"
+              routerLinkActive="active"
+              (click)="closeNavbar()"
+            >
+              Skill
+            </a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" routerLink="/Lezioni"   routerLinkActive="active">Lezioni</a>
+            <a
+              class="nav-link active"
+              aria-current="page"
+              routerLink="/Lezioni"
+              routerLinkActive="active"
+              (click)="closeNavbar()"
+            >
+              Lezioni
+            </a>
           </li>
 
           <li class="nav-item">
@@ -57,19 +91,17 @@
               class="nav-link active"
               href="/Curriculum_Vasile.pdf"
               download
+              (click)="closeNavbar()"
             >
               Scarica CV
             </a>
           </li>
 
-
-
-<!--          <li><a routerLink="/knowledge">Knowledge</a></li>-->
-<!--          <li><a routerLink="/code">Code</a></li>-->
         </ul>
       </div>
     </div>
   </nav>
+
 </div>
 
 <br> <br> <br>
