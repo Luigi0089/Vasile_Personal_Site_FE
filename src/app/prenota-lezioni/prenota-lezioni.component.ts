@@ -294,6 +294,7 @@ export class PrenotaLezioniComponent implements OnInit {
   closeModal(): void {
     this.submitted = false;
     this.modalOpen = false;
+    this.errorMsg = "";
   }
 
   submit(): void {
@@ -301,7 +302,6 @@ export class PrenotaLezioniComponent implements OnInit {
     this.errorMsg = '';
     this.conflict = undefined;
 
-    // se sta già inviando, evito doppi click
     if (this.loading) {
       return;
     }
@@ -348,8 +348,50 @@ export class PrenotaLezioniComponent implements OnInit {
           this.submitted = false;
         },
         error: (err) => {
+          const body: any = err?.error && typeof err.error === 'object' ? err.error : null;
 
-          if (this.isEdit && err?.status === 400) {
+          // 1) Caso speciale: parolacce (PROFANITY_DETECTED)
+          if (body?.code === 'PROFANITY_DETECTED') {
+            const fieldName: string | undefined = body.field;
+
+            if (fieldName) {
+              const ctrl = this.form.get(fieldName);
+              if (ctrl) {
+                ctrl.setErrors({
+                  ...(ctrl.errors || {}),
+                  profanity: true
+                });
+                ctrl.markAsTouched();
+              }
+            }
+
+            // messaggio globale in alto (sintetico)
+            this.errorMsg = body.message || 'Il testo inserito contiene termini non appropriati.';
+            console.error('Profanity error', body);
+            return;
+          }
+
+          // 2) Altri errori di validazione (VALIDATION_ERROR)
+          if (body?.code === 'VALIDATION_ERROR' && Array.isArray(body.errors)) {
+            body.errors.forEach((fe: any) => {
+              if (!fe?.field) { return; }
+              const ctrl = this.form.get(fe.field);
+              if (ctrl) {
+                ctrl.setErrors({
+                  ...(ctrl.errors || {}),
+                  server: true   // flag generico; il messaggio lo mostriamo con errorMsg
+                });
+                ctrl.markAsTouched();
+              }
+            });
+
+            this.errorMsg = body.message || 'Alcuni campi non sono validi. Verifica e riprova.';
+            console.error('Validation errors', body);
+            return;
+          }
+
+          // 3) Codice modifica errato (solo edit, 400 senza code specifico)
+          if (this.isEdit && err?.status === 400 && !body?.code) {
             const codiceCtrl = this.form.get('codiceModifica');
             if (codiceCtrl) {
               codiceCtrl.setErrors({
@@ -359,12 +401,19 @@ export class PrenotaLezioniComponent implements OnInit {
               codiceCtrl.markAsTouched();
             }
             // niente messaggio generico, niente conflitto
+            console.error('Invalid edit code', err);
             return;
-          }else if (err?.status === 409 && err?.error) {
-            this.conflict = err.error as ConflictResponse;
-          } else {
-            this.errorMsg = 'Errore durante il salvataggio della lezione.';
           }
+
+          // 4) Conflitto 409 con suggerimenti
+          if (err?.status === 409 && body) {
+            this.conflict = body as ConflictResponse;
+            console.error('Conflict response', body);
+            return;
+          }
+
+          // 5) fallback generico
+          this.errorMsg = 'Errore durante il salvataggio della lezione.';
           console.error(err);
         }
       });
