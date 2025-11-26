@@ -4,19 +4,19 @@ $fg:       #e6e6e6;
 $muted:    #a3a3a3;
 $line:     #2a2a2a;
 $accent:   #f1b20b;   // oro
-$accent-2: #ffcc3f;  // hover
+$accent-2: #ffcc3f;  // hover;
 
 /* Lista e card */
 .repo-list {
   display: grid;
   gap: 1rem;
+  margin: 0 1rem 2rem;        // 🔹 distanzia dai bordi dello schermo
 }
 
 .repo-card {
   padding: 1rem 1.25rem;
   border: 1px solid $line;
   border-radius: 20px;
- // background: rgba(255,255,255,0.02);
   transition: border-color .2s ease, background .2s ease;
 
   &:hover { border-color: rgba($accent,.35); }
@@ -61,142 +61,163 @@ $accent-2: #ffcc3f;  // hover
   box-shadow: 0 8px 24px rgba(0,0,0,.25);
   color: $fg;
 
-  /* Stili markdown (ngx-markdown rende nel DOM: nessuno Shadow DOM) */
-  markdown {
-    display: block;
-    line-height: 1.7;
-    font-size: 1rem;
+  /* 🔹 limita la crescita verticale e blocca eventuale overflow orizzontale */
+  max-height: 65vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Stili markdown (ngx-markdown rende nel DOM: nessuno Shadow DOM) */
+.readme-content markdown {
+  display: block;
+  line-height: 1.7;
+  font-size: 1rem;
+  color: $fg;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+
+  h1, h2, h3, h4, h5, h6 {
     color: $fg;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 1.5rem 0 .7rem;
+    scroll-margin-top: 80px;
+  }
 
-    h1, h2, h3, h4, h5, h6 {
-      color: $fg;
-      font-weight: 700;
-      line-height: 1.25;
-      margin: 1.5rem 0 .7rem;
-      scroll-margin-top: 80px;
-    }
+  h1 { font-size: 2rem; }
+  h2 {
+    font-size: 1.6rem;
+    padding-bottom: .55rem;
+    border-bottom: 1px solid $line;
+    position: relative;
 
-    h1 { font-size: 2rem; }
-    h2 {
-      font-size: 1.6rem;
-      padding-bottom: .55rem;
-      border-bottom: 1px solid $line;
-      position: relative;
-      /* sottolineatura dorata come nel resto del sito */
-      &::after {
-        content: "";
-        position: absolute;
-        left: 0; bottom: -1px;
-        height: 2px; width: 120px;
-        background: linear-gradient(90deg, $accent, transparent);
-        border-radius: 2px;
-      }
-    }
-    h3 { font-size: 1.25rem; }
-    h4 { font-size: 1.1rem; color: lighten($fg, 6%); }
-
-    p { margin: .8rem 0; }
-
-    a {
-      color: $accent;
-      text-decoration: none;
-      border-bottom: 1px dashed transparent;
-      transition: color .2s ease, border-color .2s ease;
-      &:hover { color: $accent-2; border-color: rgba($accent,.4); }
-    }
-
-    ul, ol {
-      margin: .6rem 0 .8rem 1.25rem;
-      padding-left: 1rem;
-    }
-    li { margin: .25rem 0; }
-    ul li::marker { color: $accent; }
-    ol li::marker { color: $accent; }
-
-    blockquote {
-      margin: 1rem 0;
-      padding: .75rem 1rem;
-      border-left: 4px solid $accent;
-      background: rgba(241,178,11,.06);
-      color: lighten($fg, 10%);
-      border-radius: 8px;
-    }
-
-    code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: .95em;
-      background: #0f0f10;
-      border: 1px solid #1f1f20;
-      padding: .15rem .35rem;
-      border-radius: 6px;
-      color: #e5e7eb;
-    }
-
-    pre {
-      background: #0f0f10;
-      border: 1px solid #1f1f20;
-      border-radius: 10px;
-      padding: .9rem 1rem;
-      overflow: auto;
-      margin: 1rem 0;
-
-      code {
-        background: transparent;
-        border: 0;
-        padding: 0;
-        color: #e5e7eb;
-        white-space: pre; // evita wrap strano
-      }
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1rem 0;
-      border: 1px solid $line;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    th, td {
-      padding: .6rem .75rem;
-      border-bottom: 1px solid $line;
-      vertical-align: top;
-    }
-    thead th {
-      background: rgba(255,255,255,0.04);
-      color: $fg;
-      text-align: left;
-    }
-    tbody tr:hover { background: rgba(255,255,255,0.03); }
-
-    img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 10px;
-      border: 1px solid $line;
-      display: block;
-      margin: .75rem auto;
-    }
-
-    hr {
-      border: 0;
-      border-top: 1px solid $line;
-      margin: 1.5rem 0;
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      height: 2px;
+      width: 120px;
+      background: linear-gradient(90deg, $accent, transparent);
+      border-radius: 2px;
     }
   }
+  h3 { font-size: 1.25rem; }
+  h4 { font-size: 1.1rem; color: lighten($fg, 6%); }
+
+  p { margin: .8rem 0; }
+
+  a {
+    color: $accent;
+    text-decoration: none;
+    border-bottom: 1px dashed transparent;
+    transition: color .2s ease, border-color .2s ease;
+
+    &:hover {
+      color: $accent-2;
+      border-color: rgba($accent,.4);
+    }
+  }
+
+  ul, ol {
+    margin: .6rem 0 .8rem 1.25rem;
+    padding-left: 1rem;
+  }
+  li { margin: .25rem 0; }
+  ul li::marker,
+  ol li::marker { color: $accent; }
+
+  blockquote {
+    margin: 1rem 0;
+    padding: .75rem 1rem;
+    border-left: 4px solid $accent;
+    background: rgba(241,178,11,.06);
+    color: lighten($fg, 10%);
+    border-radius: 8px;
+  }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: .95em;
+    background: #0f0f10;
+    border: 1px solid #1f1f20;
+    padding: .15rem .35rem;
+    border-radius: 6px;
+    color: #e5e7eb;
+  }
+
+  pre {
+    background: #0f0f10;
+    border: 1px solid #1f1f20;
+    border-radius: 10px;
+    padding: .9rem 1rem;
+    overflow: auto;
+    margin: 1rem 0;
+
+    code {
+      background: transparent;
+      border: 0;
+      padding: 0;
+      color: #e5e7eb;
+      white-space: pre; // evita wrap strano nel codice
+    }
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    border: 1px solid $line;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  th, td {
+    padding: .6rem .75rem;
+    border-bottom: 1px solid $line;
+    vertical-align: top;
+  }
+  thead th {
+    background: rgba(255,255,255,0.04);
+    color: $fg;
+    text-align: left;
+  }
+  tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    border: 1px solid $line;
+    display: block;
+    margin: .75rem auto;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid $line;
+    margin: 1.5rem 0;
+  }
+}
+
+.readme-error {
+  color: #ff7b7b;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.readme-loading {
+  font-size: 0.9rem;
+  color: $muted;
 }
 
 .section-title {
   font-size: 2rem;
-  //color: #c49b0f;
   margin-bottom: 1.5rem;
   border-bottom: 1px solid #444;
   padding-bottom: 0.5rem;
-
-
 }
 
-/* Micro‑ottimizzazioni mobile */
+/* Micro-ottimizzazioni mobile */
 @media (max-width: 520px) {
   .repo-card {
     padding: .9rem 1rem;
@@ -204,7 +225,6 @@ $accent-2: #ffcc3f;  // hover
   }
   .readme-content {
     border-radius: 10px;
+    max-height: 60vh;   // leggermente più basso su schermi piccoli
   }
 }
-
-

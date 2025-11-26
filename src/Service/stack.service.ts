@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { API_PATHS } from '../Constants/ApiPaths';
 import {Observable} from "rxjs";
 import {ProgettoDTO} from "../DTO/ProgettoDTO";
+import {ReadmeDTO} from "../DTO/ReadmeDTO";
 
 
 @Injectable({ providedIn: 'root' })
@@ -16,10 +17,9 @@ export class StackService {
     return this.http.get<ProgettoDTO[]>(API_PATHS.STACK+`/progetti`);
   }
 
-  getReadme(repoName: string): Observable<string> {
-    return this.http.get(`${API_PATHS.STACK}/readme`, {
-      params: { repoName },
-      responseType: 'text' as const
+  getReadme(repoName: string): Observable<ReadmeDTO> {
+    return this.http.get<ReadmeDTO>(`${API_PATHS.STACK}/readme`, {
+      params: { repoName }
     });
   }
 

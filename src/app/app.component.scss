@@ -2,7 +2,8 @@
   display: flex;                 /* 👈 fondamentale */
   flex-direction: column;        /* layout verticale */
   min-height: 100vh;             /* occupa tutta la viewport */
-  background: linear-gradient(to bottom, #000 10%, #1a1a1a 100%);
+  //background: linear-gradient(to bottom, #000 10%, #1a1a1a 100%);
+  background: #000;
   transition: all 0.3s ease;
 }
 
