@@ -6,6 +6,7 @@ import {SkillComponent} from "./skill/skill.component";
 import {PrenotaLezioniComponent} from "./prenota-lezioni/prenota-lezioni.component";
 import {AccettazioneLezioneComponent} from "./accettazione-lezione/accettazione-lezione.component";
 import {RifiutaLezioneComponent} from "./rifiuta-lezione/rifiuta-lezione.component";
+import {PrivacyComponent} from "./privacy/privacy.component";
 
 export const routes: Routes = [
   {path:'', component: HomepageComponent},
@@ -15,4 +16,5 @@ export const routes: Routes = [
   {path:'Lezioni', component: PrenotaLezioniComponent},
   {path:'conferma', component: AccettazioneLezioneComponent},
   {path:'rifiuta', component: RifiutaLezioneComponent},
+  {path:'privacy', component: PrivacyComponent},
 ];

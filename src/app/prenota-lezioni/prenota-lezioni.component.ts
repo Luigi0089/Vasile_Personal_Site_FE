@@ -9,6 +9,7 @@ import { LezioniService } from '../../Service/lezioni.service';
 import { LezioneRequestDto } from '../../DTO/LezioneRequestDto';
 import { LezioneResponseDto } from '../../DTO/LezioneResponseDto';
 import { ConflictResponse } from '../../DTO/ConflictResponse';
+import {RouterLink} from "@angular/router";
 
 // ---- TIPI ----
 type Slot = {
@@ -23,7 +24,7 @@ type Slot = {
 @Component({
   selector: 'app-prenota-lezioni',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './prenota-lezioni.component.html',
   styleUrls: ['./prenota-lezioni.component.scss']
 })
