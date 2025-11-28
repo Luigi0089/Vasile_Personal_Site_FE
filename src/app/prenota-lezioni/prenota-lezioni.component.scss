@@ -12,6 +12,10 @@ $ok: #26a269;
   box-sizing: border-box;
 }
 
+:root {
+  --header-height: 0px;
+}
+
 /* TOOLBAR SETTIMANA */
 .week-toolbar {
   display: flex;
@@ -19,6 +23,9 @@ $ok: #26a269;
   justify-content: center;
   gap: 12px;
   margin: 12px 0 16px;
+
+  /* sopra: spazio dell’header + i tuoi 60px “estetici” */
+  padding-top: calc(var(--header-height, 0px) + 60px);
 
   .title {
     font-weight: 600;
@@ -565,4 +572,8 @@ $ok: #26a269;
   margin-left: 2px;
 }
 
+
+#lezioni {
+  scroll-margin-top: var(--header-height);
+}
 

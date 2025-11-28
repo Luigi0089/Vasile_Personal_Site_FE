@@ -1,8 +1,17 @@
 @use '../../styles' as *;
 
+:root {
+  --header-height: 0px;
+}
+
 .skills-section {
   // padding orizzontale per staccare tutto dai bordi
   padding-inline: 1rem;
+  /* padding laterale + sotto */
+  padding: 0 20px 60px;
+
+  /* sopra: spazio dell’header + i tuoi 60px “estetici” */
+  padding-top: calc(var(--header-height, 0px) + 60px);
 
   // centra e limita la larghezza su schermi grandi
   max-width: 1200px;
@@ -253,5 +262,9 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+#skills {
+  scroll-margin-top: var(--header-height);
 }
 

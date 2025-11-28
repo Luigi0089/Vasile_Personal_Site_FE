@@ -1,11 +1,18 @@
+:root {
+  --header-height: 0px;
+}
+
 .stack-section {
-  padding: 60px 20px;
+  /* padding laterale + sotto */
+  padding: 0 20px 60px;
+
+  /* sopra: spazio dell’header + i tuoi 60px “estetici” */
+  padding-top: calc(var(--header-height, 0px) + 60px);
   background-color: transparent; // ✅ sfondo trasparente
   color: #f2f2f2;
   max-width: 800px;
   margin: 0 auto;
   scroll-margin-top: 100px;
-
   .section-title {
     font-size: 2rem;
     //color: #c49b0f;
@@ -59,4 +66,6 @@
 }
 
 
-
+#stack-intro {
+  scroll-margin-top: var(--header-height);
+}
