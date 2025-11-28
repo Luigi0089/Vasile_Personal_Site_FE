@@ -1,22 +1,37 @@
 <section id="skills" class="skills-section" aria-labelledby="skills-title">
+  <h2 id="skills-title" class="skills-title">
+    Competenze
+  </h2>
 
+  <!-- Messaggio di errore / stato -->
+  <p class="skills-error" *ngIf="errorMsg">
+    {{ errorMsg }}
+  </p>
 
-  <!-- Controls -->
-  <div class="skills-controls" role="group" aria-label="Filtri competenze">
-    <div class="chip-group">
-      <button
-        class="chip"
-        [class.active]="activeCategory === 'all'"
-        (click)="setCategory('all')">
-        Tutte
-      </button>
-      <button
-        *ngFor="let c of categories"
-        class="chip"
-        [class.active]="activeCategory === c"
-        (click)="setCategory(c)">
-        {{ c }}
-      </button>
+  <!-- Controls (mostro solo se non c'è errore) -->
+  <div
+    class="skills-controls"
+    role="group"
+    aria-label="Filtri competenze"
+    *ngIf="!errorMsg"
+  >
+
+      <div class="chip-group">
+        <button
+          class="chip"
+          [class.active]="activeCategory === 'all'"
+          (click)="setCategory('all')">
+          Tutte
+        </button>
+
+        <button
+          *ngFor="let c of categoryNames"
+          class="chip"
+          [class.active]="activeCategory === c"
+          (click)="setCategory(c)">
+          {{ c }}
+        </button>
+
     </div>
 
     <div class="search-group">
@@ -26,43 +41,73 @@
         (input)="applyFilters()"
         placeholder="Cerca"
         aria-label="Cerca competenze" />
-
+      <!--
+      <label class="strong-toggle">
+        <input type="checkbox"
+               [(ngModel)]="onlyStrong"
+               (change)="applyFilters()">
+        Solo livello ≥ 4
+      </label>
+      -->
     </div>
   </div>
 
-  <!-- Grid -->
-  <div class="skills-grid">
+  <!-- Grid principale -->
+  <div class="skills-grid" *ngIf="!errorMsg">
     <article
       *ngFor="let s of filteredSkills; trackBy: trackByName"
       class="skill-card"
       [attr.aria-label]="s.name + ' livello ' + s.level + ' su 5'">
+
       <header class="skill-head">
         <h3 class="skill-name">{{ s.name }}</h3>
+
         <span class="skill-years" *ngIf="s.years >= 0">
-    {{ s.years }}y
-  </span>
+          {{ s.years }}y
+        </span>
       </header>
 
       <p class="skill-date">
         Acquisita: {{ s.acquired | date:' yyyy' }}
       </p>
 
-
       <div class="skill-meta">
-        <span class="badge" *ngFor="let c of s.category">{{ c }}</span>
+        <!-- categorie -->
+        <span class="badge" *ngFor="let c of s.categories">
+          {{ c }}
+        </span>
 
+        <!-- livello (pallini) -->
         <div class="meter" [style.--lvl]="s.level" aria-hidden="true">
           <i *ngFor="let dot of dots; index as i" [class.fill]="i < s.level"></i>
         </div>
-        <span class="level-label">{{ levelLabel(s.level) }}</span>
+
+        <span class="level-label">
+          {{ levelLabel(s.level) }}
+        </span>
       </div>
 
+      <!-- note opzionali -->
+      <p class="skill-notes" *ngIf="s.notes">
+        {{ s.notes }}
+      </p>
 
-      <p class="skill-notes" *ngIf="s.notes">{{ s.notes }}</p>
-
+      <!-- keywords -->
       <ul class="keywords" *ngIf="s.keywords?.length">
-        <li *ngFor="let k of s.keywords">{{ k }}</li>
+        <li *ngFor="let k of s.keywords">
+          {{ k }}
+        </li>
       </ul>
     </article>
+
+    <!-- Caso nessun risultato dopo i filtri -->
+    <p class="no-results" *ngIf="!filteredSkills.length && !loading">
+      Nessuna competenza trovata con i filtri attuali.
+    </p>
   </div>
 </section>
+
+<!-- Overlay di caricamento -->
+<div class="loading-overlay" *ngIf="loading">
+  <div class="loading-spinner"></div>
+</div>
