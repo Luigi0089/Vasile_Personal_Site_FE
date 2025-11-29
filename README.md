@@ -9,6 +9,7 @@ Gestisce l’interfaccia utente per:
 - interagire con il backend tramite API REST,
 - offrire una UI moderna, elegante e completamente responsive (desktop + mobile).
 
+---
 
 # 🚀 Tech Stack
 
@@ -19,6 +20,8 @@ Gestisce l’interfaccia utente per:
 - **Reactive Forms**
 - **Angular SSR / Universal**
 - **Node.js 20+**
+
+---
 
 #📂 Struttura del progetto
 
@@ -53,6 +56,8 @@ Vasile_Personal_Site
 ├── package-lock.json
 └── tsconfig*.json              # Config TS
 ```
+
+---
 
 ## 🔌 API utilizzate dal Frontend
 
@@ -101,6 +106,7 @@ La build sarà disponibile in:
 ```bash
 /dist/vasile-personal-site
 ```
+---
 
 ## 🌐 Deploy su Render / SSR
 
