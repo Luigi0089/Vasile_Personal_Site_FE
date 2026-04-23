@@ -6,21 +6,18 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <script src="env.js"></script>
   <script>
-    import {environment} from "./environments/environment";
-
-    const targetOrigin = environment.appDomain;
+    const targetOrigin = window.APP_CONFIG?.appDomain;
     const current = window.location.origin;
-    console.log("appDomain: ", targetOrigin)
-    console.log("current: ", current)
-    const targetUrl =
-      targetOrigin +
-      window.location.pathname +
-      window.location.search +
-      window.location.hash;
 
-    console.log("current !== targetOrigin", current !== targetOrigin)
-    if (current !== targetOrigin) {
+    if (targetOrigin && current !== targetOrigin) {
+      const targetUrl =
+        targetOrigin +
+        window.location.pathname +
+        window.location.search +
+        window.location.hash;
+
       window.location.replace(targetUrl);
     }
   </script>
