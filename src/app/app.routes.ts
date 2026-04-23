@@ -11,9 +11,17 @@ import {PrivacyComponent} from "./privacy/privacy.component";
 export const routes: Routes = [
   {path:'', component: HomepageComponent},
   {path:'Home', redirectTo:"", component: AppComponent},
+  {path:'home', redirectTo:"", component: AppComponent},
+
   {path:'Stack', component: StackComponent},
+  {path:'stack', component: StackComponent},
+
   {path:'Skill', component: SkillComponent},
+  {path:'skill', component: SkillComponent},
+
   {path:'Lezioni', component: PrenotaLezioniComponent},
+  {path:'lezioni', component: PrenotaLezioniComponent},
+
   {path:'conferma', component: AccettazioneLezioneComponent},
   {path:'rifiuta', component: RifiutaLezioneComponent},
   {path:'privacy', component: PrivacyComponent},
