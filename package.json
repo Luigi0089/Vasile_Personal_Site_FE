@@ -2,6 +2,8 @@
   "name": "vasile-personal-site",
   "version": "0.0.0",
   "scripts": {
+    "generate-env:dev": "node scripts/generate-env.js dev",
+    "generate-env:prod": "node scripts/generate-env.js prod",
     "ng": "ng",
 
     "start": "ng serve",
