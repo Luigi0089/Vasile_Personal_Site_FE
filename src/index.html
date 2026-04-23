@@ -15,7 +15,10 @@
       window.location.pathname +
       window.location.search +
       window.location.hash;
+
+    if (current !== targetOrigin) {
       window.location.replace(targetUrl);
+    }
   </script>
 
   <link rel="icon" type="image/x-icon" href="Logo.png">
