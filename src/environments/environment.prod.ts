@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  appDomain: 'https://web-dot-personalsite-491208.oa.r.appspot.com',
+  appDomain: 'https://luigivasile.com',
   baseApiUrl:'https://vasilepersonalsitebe.onrender.com/luigi/vasile/personal/api'
 };
