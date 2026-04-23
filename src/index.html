@@ -10,12 +10,16 @@
     import {environment} from "./environments/environment";
 
     const targetOrigin = environment.appDomain;
+    const current = window.location.origin;
+    console.log("appDomain: ", targetOrigin)
+    console.log("current: ", current)
     const targetUrl =
       targetOrigin +
       window.location.pathname +
       window.location.search +
       window.location.hash;
 
+    console.log("current !== targetOrigin", current !== targetOrigin)
     if (current !== targetOrigin) {
       window.location.replace(targetUrl);
     }
