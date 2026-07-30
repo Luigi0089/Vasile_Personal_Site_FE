@@ -1,0 +1,228 @@
+<main class="login-page">
+
+  <section class="login-layout">
+
+    <!-- Presentazione -->
+    <div class="login-intro">
+
+      <div class="intro-content">
+        <span class="section-label">
+          Area riservata
+        </span>
+
+        <h1>
+          Gestisci il tuo spazio digitale.
+        </h1>
+
+        <p>
+          Pannello amministrativo per organizzare e aggiornare
+          i contenuti del sito personale.
+        </p>
+
+        <div class="features" aria-label="Funzioni disponibili">
+
+          <div class="feature">
+            <span class="feature-icon" aria-hidden="true">
+              01
+            </span>
+
+            <div>
+              <strong>Competenze</strong>
+              <span>Gestione di skill e tecnologie</span>
+            </div>
+          </div>
+
+          <div class="feature">
+            <span class="feature-icon" aria-hidden="true">
+              02
+            </span>
+
+            <div>
+              <strong>Categorie</strong>
+              <span>Organizzazione dei contenuti</span>
+            </div>
+          </div>
+
+          <div class="feature">
+            <span class="feature-icon" aria-hidden="true">
+              03
+            </span>
+
+            <div>
+              <strong>Keyword</strong>
+              <span>Classificazione e ricerca</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <p class="intro-footer">
+        Personal Site · Administration
+      </p>
+
+    </div>
+
+    <!-- Form -->
+    <div class="login-form-container">
+
+      <div class="login-card">
+
+        <div class="card-header">
+          <span class="mobile-brand-symbol" aria-hidden="true">
+            LV
+          </span>
+
+          <span class="eyebrow">
+            Accesso amministratore
+          </span>
+
+          <h2>Bentornato</h2>
+
+          <p>
+            Inserisci le tue credenziali per accedere
+            al pannello di gestione.
+          </p>
+        </div>
+
+        <form
+          [formGroup]="loginForm"
+          (ngSubmit)="submit()"
+          novalidate
+        >
+
+          <div class="form-field">
+            <label for="username">
+              Username
+            </label>
+
+            <div
+              class="input-wrapper"
+              [class.input-error]="
+                loginForm.controls.username.invalid &&
+                loginForm.controls.username.touched
+              "
+            >
+              <input
+                id="username"
+                type="text"
+                formControlName="username"
+                autocomplete="username"
+                placeholder="Inserisci lo username"
+              >
+            </div>
+
+            @if (
+              loginForm.controls.username.invalid &&
+              loginForm.controls.username.touched
+              ) {
+              <span class="field-error">
+                Lo username è obbligatorio.
+              </span>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="password">
+              Password
+            </label>
+
+            <div
+              class="input-wrapper password-wrapper"
+              [class.input-error]="
+                loginForm.controls.password.invalid &&
+                loginForm.controls.password.touched
+              "
+            >
+              <input
+                id="password"
+                [type]="passwordVisible() ? 'text' : 'password'"
+                formControlName="password"
+                autocomplete="current-password"
+                placeholder="Inserisci la password"
+              >
+
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="togglePasswordVisibility()"
+                [attr.aria-label]="
+                  passwordVisible()
+                    ? 'Nascondi password'
+                    : 'Mostra password'
+                "
+              >
+                @if (passwordVisible()) {
+                  <span aria-hidden="true">Nascondi</span>
+                } @else {
+                  <span aria-hidden="true">Mostra</span>
+                }
+              </button>
+            </div>
+
+            @if (
+              loginForm.controls.password.invalid &&
+              loginForm.controls.password.touched
+              ) {
+              <span class="field-error">
+                La password è obbligatoria.
+              </span>
+            }
+          </div>
+
+          @if (errorMessage()) {
+            <div
+              class="login-error"
+              role="alert"
+              aria-live="assertive"
+            >
+              <span class="error-symbol" aria-hidden="true">
+                !
+              </span>
+
+              <span>
+                {{ errorMessage() }}
+              </span>
+            </div>
+          }
+
+          <button
+            type="submit"
+            class="login-button"
+            [disabled]="loading()"
+          >
+            @if (loading()) {
+              <span
+                class="button-spinner"
+                aria-hidden="true"
+              ></span>
+
+              <span>Accesso in corso...</span>
+            } @else {
+              <span>Accedi al pannello</span>
+              <span class="button-arrow" aria-hidden="true">
+                →
+              </span>
+            }
+          </button>
+
+        </form>
+
+        <div class="security-note">
+          <span class="security-icon" aria-hidden="true">
+            ◆
+          </span>
+
+          <p>
+            Accesso riservato all’amministratore del sito.
+            La sessione è protetta tramite autenticazione JWT.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
