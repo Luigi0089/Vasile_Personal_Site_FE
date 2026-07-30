@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import {HomepageComponent} from "./homepage/homepage.component";
+import {HomepageComponent} from "./public/homepage/homepage.component";
 import {HeaderComponent} from "./header/header.component";
 import {FooterComponent} from "./footer/footer.component";
 

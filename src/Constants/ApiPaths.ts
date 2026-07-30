@@ -6,5 +6,6 @@ export const API_PATHS = {
   STACK: `${BASE_API}/stack`,
   LEZIONI: `${BASE_API}/lezioni`,
   ADMIN: `${BASE_API}/admin`,
+  AUTH: `${BASE_API}/auth`,
 };
 

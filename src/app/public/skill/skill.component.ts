@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatePipe, NgForOf, NgIf } from '@angular/common';
-import { StackService } from '../../Service/stack.service';
-import { Skill } from '../../DTO/Skill';
-import { CategoryDto } from '../../DTO/CategoryDto';
+import { StackService } from '../../../Service/stack.service';
+import { Skill } from '../../../DTO/Skill';
+import { CategoryDto } from '../../../DTO/CategoryDto';
 import { forkJoin } from 'rxjs';
 
 @Component({

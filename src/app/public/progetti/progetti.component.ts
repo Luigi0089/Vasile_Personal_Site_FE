@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForOf, NgIf } from '@angular/common';
-import { StackService } from '../../Service/stack.service';
-import { ProgettoDTO } from '../../DTO/ProgettoDTO';
+import { StackService } from '../../../Service/stack.service';
+import { ProgettoDTO } from '../../../DTO/ProgettoDTO';
 import { MarkdownModule } from 'ngx-markdown';
-import { ReadmeDTO } from '../../DTO/ReadmeDTO';
+import { ReadmeDTO } from '../../../DTO/ReadmeDTO';
 
 @Component({
   selector: 'app-progetti',

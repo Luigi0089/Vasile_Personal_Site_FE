@@ -1,28 +1,105 @@
 import { Routes } from '@angular/router';
-import {AppComponent} from "./app.component";
-import {HomepageComponent} from "./homepage/homepage.component";
-import {StackComponent} from "./stack/stack.component";
-import {SkillComponent} from "./skill/skill.component";
-import {PrenotaLezioniComponent} from "./prenota-lezioni/prenota-lezioni.component";
-import {AccettazioneLezioneComponent} from "./accettazione-lezione/accettazione-lezione.component";
-import {RifiutaLezioneComponent} from "./rifiuta-lezione/rifiuta-lezione.component";
-import {PrivacyComponent} from "./privacy/privacy.component";
+
+import { HomepageComponent } from './public/homepage/homepage.component';
+import { StackComponent } from './public/stack/stack.component';
+import { SkillComponent } from './public/skill/skill.component';
+import { PrenotaLezioniComponent } from './public/prenota-lezioni/prenota-lezioni.component';
+import { PrivacyComponent } from './public/privacy/privacy.component';
+import { AccettazioneLezioneComponent} from './admin/accettazione-lezione/accettazione-lezione.component';
+import {RifiutaLezioneComponent} from './admin/rifiuta-lezione/rifiuta-lezione.component';
+import {LoginComponent} from './admin/login/login.component';
+import { DashboardComponent} from './admin/dashboard/dashboard.component';
+import { adminGuard } from '../guards/admin.guard';
 
 export const routes: Routes = [
-  {path:'', component: HomepageComponent},
-  {path:'Home', redirectTo:"", component: AppComponent},
-  {path:'home', redirectTo:"", component: AppComponent},
 
-  {path:'Stack', component: StackComponent},
-  {path:'stack', component: StackComponent},
+  // ======================
+  //       PUBBLICHE
+  // ======================
 
-  {path:'Skill', component: SkillComponent},
-  {path:'skill', component: SkillComponent},
+  {
+    path: '',
+    component: HomepageComponent,
+    pathMatch: 'full'
+  },
 
-  {path:'Lezioni', component: PrenotaLezioniComponent},
-  {path:'lezioni', component: PrenotaLezioniComponent},
+  {
+    path: 'Home',
+    redirectTo: '',
+    pathMatch: 'full'
+  },
+  {
+    path: 'home',
+    redirectTo: '',
+    pathMatch: 'full'
+  },
 
-  {path:'conferma', component: AccettazioneLezioneComponent},
-  {path:'rifiuta', component: RifiutaLezioneComponent},
-  {path:'privacy', component: PrivacyComponent},
+  {
+    path: 'Stack',
+    component: StackComponent
+  },
+  {
+    path: 'stack',
+    redirectTo: 'Stack',
+    pathMatch: 'full'
+  },
+
+  {
+    path: 'Skill',
+    component: SkillComponent
+  },
+  {
+    path: 'skill',
+    redirectTo: 'Skill',
+    pathMatch: 'full'
+  },
+
+  {
+    path: 'Lezioni',
+    component: PrenotaLezioniComponent
+  },
+  {
+    path: 'lezioni',
+    redirectTo: 'Lezioni',
+    pathMatch: 'full'
+  },
+
+  {
+    path: 'conferma',
+    component: AccettazioneLezioneComponent
+  },
+
+  {
+    path: 'rifiuta',
+    component: RifiutaLezioneComponent
+  },
+
+  {
+    path: 'privacy',
+    component: PrivacyComponent
+  },
+
+  // ======================
+  //       ADMIN
+  // ======================
+
+  {
+    path: 'admin/login',
+    component: LoginComponent
+  },
+
+  {
+    path: 'admin',
+    component: DashboardComponent,
+    canActivate: [adminGuard]
+  },
+
+  // ======================
+  //       FALLBACK
+  // ======================
+
+  {
+    path: '**',
+    redirectTo: ''
+  }
 ];

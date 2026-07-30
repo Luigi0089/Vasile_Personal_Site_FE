@@ -5,10 +5,10 @@ import { addDays, format, startOfWeek } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { finalize } from 'rxjs/operators';
 
-import { LezioniService } from '../../Service/lezioni.service';
-import { LezioneRequestDto } from '../../DTO/LezioneRequestDto';
-import { LezioneResponseDto } from '../../DTO/LezioneResponseDto';
-import { ConflictResponse } from '../../DTO/ConflictResponse';
+import { LezioniService } from '../../../Service/lezioni.service';
+import { LezioneRequestDto } from '../../../DTO/LezioneRequestDto';
+import { LezioneResponseDto } from '../../../DTO/LezioneResponseDto';
+import { ConflictResponse } from '../../../DTO/ConflictResponse';
 import {RouterLink} from "@angular/router";
 
 // ---- TIPI ----

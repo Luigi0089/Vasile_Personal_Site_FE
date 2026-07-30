@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {RouterLink} from "@angular/router";
-import {AdminService} from "../../Service/admin.service";
+import {AdminService} from "../../../Service/admin.service";
 
 @Component({
   selector: 'app-homepage',
