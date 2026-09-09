@@ -47,6 +47,7 @@
 ================================================== */
 
 .dashboard-header {
+  margin-top: 10px;
   display: flex;
   justify-content: space-between;
   gap: 2rem;
@@ -256,6 +257,7 @@
 ================================================== */
 
 .statistics-grid {
+  margin-top: 20px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 
@@ -885,6 +887,7 @@
   }
 
   .dashboard-header {
+    margin-top: 20px;
     flex-direction: column;
 
     padding: 2rem;
@@ -921,6 +924,7 @@
   }
 
   .dashboard-header {
+    margin-top: 20px;
     padding: 1.5rem;
 
     border-radius: 1rem;

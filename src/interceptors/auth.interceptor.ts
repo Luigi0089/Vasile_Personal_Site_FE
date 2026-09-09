@@ -20,8 +20,8 @@ export const authInterceptor: HttpInterceptorFn = (
 
   const publicAdminEndpoints = [
     `${API_PATHS.ADMIN}/ping`,
-    `${API_PATHS.ADMIN}/conferma`,
-    `${API_PATHS.ADMIN}/rifiuta`
+    // `${API_PATHS.ADMIN}/conferma`,
+    // `${API_PATHS.ADMIN}/rifiuta`
   ];
 
   const isAdminRequest =

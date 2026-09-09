@@ -120,9 +120,13 @@
 
           <a
             routerLink="/admin/lezioni"
-            [queryParams]="{ stato: 'CONFERMATA' }"
+            [routerLink]="['/admin/lezioni']"
+            [queryParams]="{
+                            vista: 'confermate',
+                            data: currentDate
+                          }"
           >
-            Visualizza lezioni
+            Gestisci lezioni
             <span aria-hidden="true">→</span>
           </a>
 
@@ -172,7 +176,10 @@
 
           <a
             routerLink="/admin/lezioni"
-            [queryParams]="{ stato: 'DA_CONFERMARE' }"
+            [queryParams]="{
+                            vista: 'da-confermare',
+                            data: currentDate
+                          }"
           >
             Gestisci prenotazioni
             <span aria-hidden="true">→</span>
@@ -185,12 +192,21 @@
     </section>
 
 
+    <div class="section-header lessons-section-header">
 
+      <div style="margin-top: 20px">
+        <h2 id="Skill-title">
+          Gestione Skill
+        </h2>
+      </div>
+
+    </div>
     <!-- STATISTICHE CONTENUTI -->
     <section
       class="statistics-grid"
       aria-label="Riepilogo contenuti"
     >
+
 
       <!-- COMPETENZE -->
       <article class="stat-card">

@@ -7,6 +7,7 @@ import { Skill } from '../DTO/Skill';
 import { CategoryDto } from '../DTO/CategoryDto';
 import { KeywordDto } from '../DTO/KeywordDto';
 import { DashboardStatsDto } from '../DTO/DashboardStatsDto';
+import {LezioneResponseDto} from "../DTO/LezioneResponseDto";
 @Injectable({
   providedIn: 'root'
 })
@@ -156,6 +157,22 @@ export class AdminService {
     const params = new HttpParams().set('data', data);
     return this.http.get<DashboardStatsDto>(
       `${this.BASE}/dashboard/stats`,
+      {params}
+    );
+  }
+
+  getLezioniConfermate(data: string): Observable<LezioneResponseDto[]> {
+    const params = new HttpParams().set('data', data);
+    return this.http.get<LezioneResponseDto[]>(
+      `${this.BASE}/settimana/confermate`,
+      {params}
+    );
+  }
+
+  getLezioniDaConfermare(data: string): Observable<LezioneResponseDto[]> {
+    const params = new HttpParams().set('data', data);
+    return this.http.get<LezioneResponseDto[]>(
+      `${this.BASE}/settimana/da/confermare`,
       {params}
     );
   }

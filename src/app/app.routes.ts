@@ -10,6 +10,7 @@ import {RifiutaLezioneComponent} from './admin/rifiuta-lezione/rifiuta-lezione.c
 import {LoginComponent} from './admin/login/login.component';
 import { DashboardComponent} from './admin/dashboard/dashboard.component';
 import { adminGuard } from '../guards/admin.guard';
+import {GestioneLezioniComponent} from "./admin/gestione-lezioni/gestione-lezioni.component";
 
 export const routes: Routes = [
 
@@ -93,6 +94,13 @@ export const routes: Routes = [
     component: DashboardComponent,
     canActivate: [adminGuard]
   },
+
+  {
+    path: 'admin/lezioni',
+    component: GestioneLezioniComponent,
+    canActivate: [adminGuard]
+  },
+
 
   // ======================
   //       FALLBACK

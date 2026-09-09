@@ -1,0 +1,1090 @@
+<main class="lessons-page">
+
+  <section class="lessons-shell">
+
+    <!-- HEADER -->
+    <header class="page-header">
+
+      <div class="header-copy">
+
+        <a
+          routerLink="/admin"
+          class="back-link"
+        >
+          <span aria-hidden="true">
+            ←
+          </span>
+
+          Dashboard
+        </a>
+
+        <span class="eyebrow">
+          Area amministrativa
+        </span>
+
+        <h1>
+          {{ titoloPagina() }}
+        </h1>
+
+        <p>
+          {{ descrizionePagina() }}
+        </p>
+
+      </div>
+
+      <div class="header-summary">
+
+        <span class="summary-label">
+          Risultati
+        </span>
+
+        <strong>
+          {{ lezioniFiltrate().length }}
+        </strong>
+
+        <span>
+          su {{ lezioni().length }}
+        </span>
+
+      </div>
+
+    </header>
+
+    <!-- SWITCH STATO LEZIONI -->
+    <nav
+      class="status-switch"
+      aria-label="Seleziona lo stato delle lezioni"
+      role="tablist"
+    >
+
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="vista() === 'confermate'"
+        [class.active]="vista() === 'confermate'"
+        (click)="cambiaVista('confermate')"
+      >
+
+        <span
+          class="tab-icon tab-icon--confirmed"
+          aria-hidden="true"
+        >
+          ✓
+        </span>
+
+        <span class="tab-copy">
+
+          <strong>
+            Confermate
+          </strong>
+
+          <small>
+            Lezioni già approvate
+          </small>
+
+        </span>
+
+      </button>
+
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="vista() === 'da-confermare'"
+        [class.active]="vista() === 'da-confermare'"
+        (click)="cambiaVista('da-confermare')"
+      >
+
+        <span
+          class="tab-icon tab-icon--pending"
+          aria-hidden="true"
+        >
+          !
+        </span>
+
+        <span class="tab-copy">
+
+          <strong>
+            Da confermare
+          </strong>
+
+          <small>
+            Richieste in attesa
+          </small>
+
+        </span>
+
+      </button>
+
+    </nav>
+
+    <!-- SELETTORE SETTIMANA -->
+    <section class="week-toolbar">
+
+      <div class="week-navigation">
+
+        <button
+          type="button"
+          class="icon-button"
+          aria-label="Visualizza la settimana precedente"
+          title="Settimana precedente"
+          (click)="settimanaPrecedente()"
+        >
+          ‹
+        </button>
+
+        <div class="week-copy">
+
+          <span>
+            Settimana selezionata
+          </span>
+
+          <strong>
+            {{ etichettaSettimana() }}
+          </strong>
+
+        </div>
+
+        <button
+          type="button"
+          class="icon-button"
+          aria-label="Visualizza la settimana successiva"
+          title="Settimana successiva"
+          (click)="settimanaSuccessiva()"
+        >
+          ›
+        </button>
+
+      </div>
+
+      <div class="week-actions">
+
+        <label class="date-picker">
+
+          <span>
+            Vai alla data
+          </span>
+
+          <input
+            type="date"
+            [value]="dataRiferimento()"
+            (change)="cambiaData($event)"
+          >
+
+        </label>
+
+        <button
+          type="button"
+          class="secondary-button"
+          (click)="vaiAllaSettimanaCorrente()"
+        >
+          Settimana corrente
+        </button>
+
+      </div>
+
+    </section>
+
+    <!-- FILTRI -->
+    <section class="filters-card">
+
+      <div class="filters-header">
+
+        <div>
+
+          <span class="section-eyebrow">
+            Ricerca
+          </span>
+
+          <h2>
+            Filtra e ordina
+          </h2>
+
+        </div>
+
+        <button
+          type="button"
+          class="reset-button"
+          [disabled]="!filtriAttivi()"
+          (click)="resetFiltri()"
+        >
+          Azzera filtri
+        </button>
+
+      </div>
+
+      <form
+        class="filters-grid"
+        [formGroup]="formFiltri"
+      >
+
+        <!-- NOME STUDENTE -->
+        <label class="filter-field filter-field--wide">
+
+          <span>
+            Nome studente
+          </span>
+
+          <div class="input-wrapper">
+
+            <span
+              class="input-icon"
+              aria-hidden="true"
+            >
+              ⌕
+            </span>
+
+            <input
+              type="search"
+              formControlName="nomeStudente"
+              list="studentiDisponibili"
+              placeholder="Cerca per nome..."
+              autocomplete="off"
+            >
+
+          </div>
+
+          <datalist id="studentiDisponibili">
+
+            <option
+              *ngFor="
+                let studente of studentiDisponibili()
+              "
+              [value]="studente"
+            >
+            </option>
+
+          </datalist>
+
+        </label>
+
+        <!-- MATERIA -->
+        <label class="filter-field">
+
+          <span>
+            Materia
+          </span>
+
+          <select formControlName="materia">
+
+            <option value="">
+              Tutte le materie
+            </option>
+
+            <option
+              *ngFor="
+                let materia of materieDisponibili()
+              "
+              [value]="materia"
+            >
+              {{ materia }}
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- LIVELLO -->
+        <label class="filter-field">
+
+          <span>
+            Livello
+          </span>
+
+          <select formControlName="livello">
+
+            <option value="">
+              Tutti i livelli
+            </option>
+
+            <option
+              *ngFor="
+                let livello of livelliDisponibili()
+              "
+              [value]="livello"
+            >
+              {{ livello }}
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- DATA -->
+        <label class="filter-field">
+
+          <span>
+            Giorno
+          </span>
+
+          <select formControlName="dataLezione">
+
+            <option value="">
+              Tutti i giorni
+            </option>
+
+            <option
+              *ngFor="
+                let data of dateDisponibili()
+              "
+              [value]="data"
+            >
+              {{ formattaDataFiltro(data) }}
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- ORARIO -->
+        <label class="filter-field">
+
+          <span>
+            Orario di inizio
+          </span>
+
+          <select formControlName="orarioInizio">
+
+            <option value="">
+              Tutti gli orari
+            </option>
+
+            <option
+              *ngFor="
+                let orario of orariDisponibili()
+              "
+              [value]="orario"
+            >
+              {{ formattaOra(orario) }}
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- ORDINAMENTO -->
+        <label class="filter-field">
+
+          <span>
+            Ordina per
+          </span>
+
+          <select formControlName="ordinamento">
+
+            <option
+              *ngFor="
+                let campo of campiOrdinamento
+              "
+              [value]="campo.value"
+            >
+              {{ campo.label }}
+            </option>
+
+          </select>
+
+        </label>
+
+        <!-- DIREZIONE -->
+        <label class="filter-field">
+
+          <span>
+            Direzione
+          </span>
+
+          <select formControlName="direzione">
+
+            <option value="asc">
+              Crescente
+            </option>
+
+            <option value="desc">
+              Decrescente
+            </option>
+
+          </select>
+
+        </label>
+
+      </form>
+
+    </section>
+
+    <!-- ERRORE -->
+    <section
+      *ngIf="errore() && !loading()"
+      class="feedback-card feedback-card--error"
+      role="alert"
+    >
+
+      <div
+        class="feedback-icon"
+        aria-hidden="true"
+      >
+        !
+      </div>
+
+      <div class="feedback-copy">
+
+        <strong>
+          Caricamento non riuscito
+        </strong>
+
+        <p>
+          {{ errore() }}
+        </p>
+
+      </div>
+
+      <button
+        type="button"
+        class="secondary-button"
+        (click)="ricarica()"
+      >
+        Riprova
+      </button>
+
+    </section>
+
+    <!-- CARICAMENTO -->
+    <section
+      *ngIf="loading()"
+      class="loading-card"
+      aria-live="polite"
+      aria-busy="true"
+    >
+
+      <span
+        class="spinner"
+        aria-hidden="true"
+      >
+      </span>
+
+      <div>
+
+        <strong>
+          Caricamento lezioni
+        </strong>
+
+        <p>
+          Recupero i dati della settimana selezionata.
+        </p>
+
+      </div>
+
+    </section>
+
+    <!-- ESITO OPERAZIONI -->
+    <section
+      *ngIf="messaggioOperazione()"
+      class="feedback-card feedback-card--success"
+      role="status"
+    >
+
+      <div
+        class="feedback-icon feedback-icon--success"
+        aria-hidden="true"
+      >
+        ✓
+      </div>
+
+      <div class="feedback-copy">
+        <strong>
+          Operazione completata
+        </strong>
+
+        <p>
+          {{ messaggioOperazione() }}
+        </p>
+      </div>
+
+    </section>
+
+    <section
+      *ngIf="erroreOperazione()"
+      class="feedback-card feedback-card--error"
+      role="alert"
+    >
+
+      <div
+        class="feedback-icon"
+        aria-hidden="true"
+      >
+        !
+      </div>
+
+      <div class="feedback-copy">
+        <strong>
+          Operazione non riuscita
+        </strong>
+
+        <p>
+          {{ erroreOperazione() }}
+        </p>
+      </div>
+
+    </section>
+
+    <!-- RISULTATI -->
+    <section
+      *ngIf="!loading() && !errore()"
+      class="results-card"
+    >
+
+      <div class="results-header">
+
+        <div>
+
+          <span class="section-eyebrow">
+            Elenco
+          </span>
+
+          <h2>
+            {{ titoloPagina() }}
+          </h2>
+
+        </div>
+
+        <div class="results-counter">
+
+          <strong>
+            {{ lezioniFiltrate().length }}
+          </strong>
+
+          <span>
+            {{
+              lezioniFiltrate().length === 1
+                ? 'lezione trovata'
+                : 'lezioni trovate'
+            }}
+          </span>
+
+        </div>
+
+      </div>
+
+      <!-- TABELLA LEZIONI -->
+      <div
+        *ngIf="lezioniFiltrate().length > 0"
+        class="lessons-table-container"
+      >
+
+        <table>
+
+          <colgroup>
+            <col class="col-date">
+            <col class="col-time">
+            <col class="col-student">
+            <col class="col-subject">
+            <col class="col-level">
+            <col class="col-notes">
+            <col class="col-status">
+            <col class="col-actions">
+          </colgroup>
+
+          <thead>
+
+          <tr>
+            <th scope="col">
+              Data
+            </th>
+
+            <th scope="col">
+              Orario
+            </th>
+
+            <th scope="col">
+              Studente
+            </th>
+
+            <th scope="col">
+              Materia
+            </th>
+
+            <th scope="col">
+              Livello
+            </th>
+
+            <th scope="col">
+              Note
+            </th>
+
+            <th scope="col">
+              Stato
+            </th>
+
+            <th
+              scope="col"
+              class="actions-heading"
+            >
+              Azioni
+            </th>
+          </tr>
+
+          </thead>
+
+          <tbody>
+
+          <tr
+            *ngFor="
+                let lezione of lezioniFiltrate();
+                trackBy: trackById
+              "
+          >
+
+            <!-- DATA -->
+            <td data-label="Data">
+
+              <div class="date-cell">
+
+                <strong>
+                  {{ formattaData(lezione.dataLezione) }}
+                </strong>
+
+              </div>
+
+            </td>
+
+            <!-- ORARIO -->
+            <td data-label="Orario">
+
+              <div class="time-cell">
+
+                <strong>
+                  {{ formattaOra(lezione.orarioInizio) }}
+                </strong>
+
+                <span aria-hidden="true">
+                    →
+                  </span>
+
+                <span>
+                    {{ formattaOra(lezione.orarioFine) }}
+                  </span>
+
+              </div>
+
+            </td>
+
+            <!-- STUDENTE -->
+            <td data-label="Studente">
+
+              <div class="student-cell">
+
+                <div
+                  class="student-avatar"
+                  aria-hidden="true"
+                >
+                  {{
+                    lezione.nomeStudente
+                      ? lezione.nomeStudente
+                        .charAt(0)
+                        .toUpperCase()
+                      : '?'
+                  }}
+                </div>
+
+                <div>
+
+                  <strong>
+                    {{ lezione.nomeStudente }}
+                  </strong>
+
+                  <a
+                    [href]="'mailto:' + lezione.email"
+                  >
+                    {{ lezione.email }}
+                  </a>
+
+                </div>
+
+              </div>
+
+            </td>
+
+            <!-- MATERIA -->
+            <td data-label="Materia">
+
+                <span class="subject-badge">
+                  {{ lezione.materia }}
+                </span>
+
+            </td>
+
+            <!-- LIVELLO -->
+            <td data-label="Livello">
+              {{ lezione.livello }}
+            </td>
+
+            <!-- NOTE -->
+            <td data-label="Note">
+
+              <div
+                *ngIf="
+                  lezione.note;
+                  else nessunaNota
+                "
+                class="notes-scroll"
+              >
+                {{ lezione.note }}
+              </div>
+
+              <ng-template #nessunaNota>
+
+                <span class="empty-value">
+                  Nessuna nota
+                </span>
+
+              </ng-template>
+
+            </td>
+
+            <!-- STATO -->
+            <td data-label="Stato">
+
+                <span
+                  class="status-badge"
+                  [class.status-badge--confirmed]="
+                    mostraConfermate()
+                  "
+                  [class.status-badge--pending]="
+                    !mostraConfermate()
+                  "
+                >
+
+                  <span
+                    class="status-dot"
+                    aria-hidden="true"
+                  >
+                  </span>
+
+                  {{
+                    mostraConfermate()
+                      ? 'Confermata'
+                      : 'Da confermare'
+                  }}
+
+                </span>
+
+            </td>
+
+            <!-- AZIONI -->
+            <td
+              data-label="Azioni"
+              class="actions-cell"
+            >
+
+              <div class="lesson-actions">
+
+                <button
+                  *ngIf="!mostraConfermate()"
+                  type="button"
+                  class="lesson-action lesson-action--confirm"
+                  [disabled]="isRigaBloccata(lezione.id)"
+                  (click)="confermaLezione(lezione)"
+                >
+                  <span aria-hidden="true">
+                    ✓
+                  </span>
+
+                  {{
+                    isAzioneInCorso(
+                      lezione.id,
+                      'conferma'
+                    )
+                      ? 'Conferma...'
+                      : 'Conferma'
+                  }}
+                </button>
+
+                <button
+                  type="button"
+                  class="lesson-action lesson-action--edit"
+                  title="Proponi modifica"
+                  [disabled]="isRigaBloccata(lezione.id)"
+                  (click)="apriPopupModifica(lezione)"
+                >
+                  <span aria-hidden="true">
+                    ✎
+                  </span>
+
+                  Modifica
+                </button>
+
+                <button
+                  type="button"
+                  class="lesson-action lesson-action--cancel"
+                  [disabled]="isRigaBloccata(lezione.id)"
+                  (click)="annullaLezione(lezione)"
+                >
+                  <span aria-hidden="true">
+                    ×
+                  </span>
+
+                  {{
+                    isAzioneInCorso(
+                      lezione.id,
+                      'annulla'
+                    )
+                      ? 'Annulla...'
+                      : 'Annulla'
+                  }}
+                </button>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <!-- NESSUN RISULTATO -->
+      <div
+        *ngIf="lezioniFiltrate().length === 0"
+        class="empty-state"
+      >
+
+        <div
+          class="empty-state-icon"
+          aria-hidden="true"
+        >
+          ◷
+        </div>
+
+        <h3>
+          Nessuna lezione trovata
+        </h3>
+
+        <p *ngIf="lezioni().length === 0">
+          Non risultano lezioni per questa settimana
+          e per lo stato selezionato.
+        </p>
+
+        <p *ngIf="lezioni().length > 0">
+          Nessuna lezione corrisponde ai filtri impostati.
+        </p>
+
+        <button
+          *ngIf="filtriAttivi()"
+          type="button"
+          class="secondary-button"
+          (click)="resetFiltri()"
+        >
+          Rimuovi i filtri
+        </button>
+
+      </div>
+
+    </section>
+
+  </section>
+
+
+  <!-- POPUP PROPOSTA MODIFICA -->
+  <div
+    *ngIf="lezioneInModifica() as lezione"
+    class="modal-backdrop"
+    role="presentation"
+    (click)="chiudiPopupModifica()"
+  >
+
+    <section
+      class="lesson-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="propostaModificaTitle"
+      (click)="$event.stopPropagation()"
+    >
+
+      <header class="modal-header">
+
+        <div>
+          <span class="section-eyebrow">
+            Gestione lezione
+          </span>
+
+          <h2 id="propostaModificaTitle">
+            Proponi una modifica
+          </h2>
+
+          <p>
+            I dati della richiesta restano visibili;
+            puoi modificare data e orari e indicare la motivazione.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="modal-close"
+          aria-label="Chiudi il popup"
+          (click)="chiudiPopupModifica()"
+        >
+          ×
+        </button>
+
+      </header>
+
+      <form
+        class="modal-form"
+        [formGroup]="formPropostaModifica"
+        (ngSubmit)="preparaPropostaModifica()"
+      >
+
+        <section class="modal-section modal-section--student">
+
+          <div class="student-avatar">
+            {{
+              lezione.nomeStudente
+                ? lezione.nomeStudente
+                  .charAt(0)
+                  .toUpperCase()
+                : '?'
+            }}
+          </div>
+
+          <div>
+            <strong>
+              {{ lezione.nomeStudente }}
+            </strong>
+
+            <a [href]="'mailto:' + lezione.email">
+              {{ lezione.email }}
+            </a>
+          </div>
+
+        </section>
+
+        <div class="modal-grid">
+
+          <label class="modal-field">
+            <span>Nome studente</span>
+
+            <input
+              type="text"
+              formControlName="nomeStudente"
+              readonly
+            >
+          </label>
+
+          <label class="modal-field">
+            <span>Email</span>
+
+            <input
+              type="email"
+              formControlName="email"
+              readonly
+            >
+          </label>
+
+          <label class="modal-field">
+            <span>Materia</span>
+
+            <input
+              type="text"
+              formControlName="materia"
+              readonly
+            >
+          </label>
+
+          <label class="modal-field">
+            <span>Livello</span>
+
+            <input
+              type="text"
+              formControlName="livello"
+              readonly
+            >
+          </label>
+
+          <label class="modal-field modal-field--full">
+            <span>Note dello studente</span>
+
+            <textarea
+              formControlName="note"
+              rows="3"
+              readonly
+              placeholder="Nessuna nota inserita"
+            ></textarea>
+          </label>
+
+          <label class="modal-field">
+            <span>Nuova data</span>
+
+            <input
+              type="date"
+              formControlName="dataLezione"
+            >
+          </label>
+
+          <label class="modal-field">
+            <span>Nuovo orario di inizio</span>
+
+            <input
+              type="time"
+              formControlName="orarioInizio"
+            >
+          </label>
+
+          <label class="modal-field">
+            <span>Nuovo orario di fine</span>
+
+            <input
+              type="time"
+              formControlName="orarioFine"
+            >
+          </label>
+
+          <label class="modal-field modal-field--full">
+            <span>Motivazione</span>
+
+            <textarea
+              formControlName="motivazione"
+              rows="5"
+              maxlength="1000"
+              placeholder="Spiega allo studente il motivo della proposta..."
+            ></textarea>
+
+            <small>
+              Campo obbligatorio, massimo 1000 caratteri.
+            </small>
+          </label>
+
+        </div>
+
+        <p
+          *ngIf="erroreModifica()"
+          class="modal-error"
+          role="alert"
+        >
+          {{ erroreModifica() }}
+        </p>
+
+        <footer class="modal-actions">
+
+          <button
+            type="button"
+            class="modal-button modal-button--secondary"
+            (click)="chiudiPopupModifica()"
+          >
+            Chiudi
+          </button>
+
+          <button
+            type="submit"
+            class="modal-button modal-button--primary"
+          >
+            Prepara proposta
+          </button>
+
+        </footer>
+
+      </form>
+
+    </section>
+
+  </div>
+
+</main>
