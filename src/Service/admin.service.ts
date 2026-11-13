@@ -47,7 +47,7 @@ export class AdminService {
 
   wakeUp(): Observable<string> {
     return this.http.get(
-      `${this.BASE}/ping`,
+      `${API_PATHS.AUTH}/ping`,
       {
         responseType: 'text'
       }
