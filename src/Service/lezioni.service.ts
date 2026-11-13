@@ -1,6 +1,7 @@
 import {LezioneResponseDto} from "../DTO/LezioneResponseDto";
 import {Observable} from "rxjs";
 import {LezioneRequestDto} from "../DTO/LezioneRequestDto";
+import {LezionePubblicaDto} from "../DTO/LezionePubblicaDto";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {Injectable} from "@angular/core";
 import {API_PATHS} from "../Constants/ApiPaths";
@@ -12,9 +13,9 @@ export class LezioniService {
 
   constructor(private http: HttpClient) {}
 
-  getLezioniSettimana(data: string): Observable<LezioneResponseDto[]> {
+  getLezioniSettimana(data: string): Observable<LezionePubblicaDto[]> {
     const params = new HttpParams().set('data', data);
-    return this.http.get<LezioneResponseDto[]>(`${this.BASE}/settimana`, { params });
+    return this.http.get<LezionePubblicaDto[]>(`${this.BASE}/settimana`, { params });
   }
 
   creaLezione(body: LezioneRequestDto): Observable<LezioneResponseDto> {

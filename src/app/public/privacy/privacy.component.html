@@ -30,17 +30,18 @@
       </p>
       <ul>
         <li>
-          <strong>Dati anagrafici e di contatto</strong>: nome e cognome,
-          indirizzo e-mail.
+          <strong>Dati anagrafici e di contatto</strong>: nome e indirizzo e-mail.
         </li>
         <li>
           <strong>Dati relativi alla prenotazione</strong>: materia di interesse,
-          livello di studio, eventuali note inserite dall’utente.
+          livello di studio, data e orario della lezione, indicazione se si tratta
+          di una lezione di prova, eventuali note inserite dall’utente e il
+          codice di modifica generato dal sistema.
         </li>
         <li>
-          <strong>Dati tecnici</strong>: indirizzo IP, data e ora della richiesta,
-          log tecnici generati automaticamente dal sistema per finalità di sicurezza
-          e manutenzione.
+          <strong>Dati tecnici</strong>: indirizzo IP, data e ora della richiesta
+          e log tecnici generati automaticamente dall’infrastruttura di hosting
+          per finalità di sicurezza e manutenzione.
         </li>
         <li>
           <strong>Metadati di navigazione</strong> raccolti automaticamente dai
@@ -48,8 +49,14 @@
         </li>
       </ul>
       <p>
-        Non vengono trattate categorie particolari di dati personali ai sensi
-        dell’art. 9 GDPR.
+        Il campo “Note” è libero: si invita a non inserirvi informazioni
+        non necessarie alla prenotazione, in particolare dati relativi alla salute
+        o ad altre categorie particolari ai sensi dell’art. 9 GDPR, che il
+        Titolare non richiede e non tratta intenzionalmente.
+      </p>
+      <p>
+        Per l’uso di cookie e strumenti analoghi si rimanda alla
+        <a routerLink="/cookie-policy">Cookie Policy</a>.
       </p>
     </section>
 
@@ -88,15 +95,14 @@
         art. 6, par. 1, lett. c) GDPR.
       </p>
 
-      <h3>d) Consenso dell’interessato</h3>
+      <h3>d) Presa visione dell’informativa</h3>
       <p>
-        In relazione alla visualizzazione e accettazione dell’informativa
-        privacy mediante l’apposita modale presente sul sito, il trattamento
-        avviene sulla base del consenso espresso dall’utente.
-      </p>
-      <p>
-        <strong>Base giuridica:</strong>
-        art. 6, par. 1, lett. a) GDPR – consenso dell’interessato.
+        Prima della prenotazione, la pagina mostra un avviso con cui l’utente
+        dichiara di aver letto questa informativa e il sistema memorizza nel
+        browser soltanto la scelta di non riproporlo (vedi
+        <a routerLink="/cookie-policy">Cookie Policy</a>).
+        Si tratta di una semplice presa visione: il trattamento dei dati per la
+        prenotazione non si fonda sul consenso, ma sulle basi indicate al punto a).
       </p>
     </section>
 
@@ -131,11 +137,11 @@
       <ul>
         <li>
           fornitori di servizi di <strong>hosting</strong> e infrastruttura
-          informatica (ad es. Render.com);
+          informatica (Google Cloud);
         </li>
         <li>
           fornitori di <strong>servizi e-mail</strong> utilizzati per
-          l’invio delle comunicazioni;
+          l’invio delle comunicazioni (Mailjet);
         </li>
         <li>
           fornitori di <strong>servizi di database</strong> necessari alla
@@ -182,16 +188,23 @@
       </p>
       <ul>
         <li>
-          per tutta la durata necessaria alla gestione della richiesta di
-          prenotazione della lezione;
+          i dati della prenotazione sono conservati per tutta la durata
+          necessaria alla gestione della lezione;
         </li>
         <li>
-          per un ulteriore periodo massimo di
-          <strong>24 mesi</strong> per esigenze amministrative interne
-          e di tutela in caso di eventuali controversie;
+          una procedura automatica, eseguita una volta al mese, elimina le
+          prenotazioni la cui data è trascorsa da almeno
+          <strong>30 giorni</strong>: in pratica i dati vengono cancellati
+          entro circa due mesi dalla data della lezione;
         </li>
         <li>
-          oltre tale periodo, esclusivamente per l’adempimento di obblighi di
+          le e-mail inviate restano nelle caselle di posta del mittente e del
+          destinatario e, per il tempo tecnico necessario, presso il fornitore
+          del servizio e-mail; i log tecnici sono conservati dal fornitore di
+          hosting per i tempi da questi stabiliti;
+        </li>
+        <li>
+          oltre tali periodi, esclusivamente per l’adempimento di obblighi di
           legge o su richiesta dell’Autorità Giudiziaria o di altre autorità
           competenti.
         </li>
@@ -209,6 +222,11 @@
         nel modulo di prenotazione è necessario per poter dar corso alla
         richiesta dell’utente. Il mancato conferimento di tali dati comporterà
         l’impossibilità di gestire la prenotazione della lezione.
+      </p>
+      <p>
+        Le lezioni possono essere rivolte anche a studenti minorenni. In tal caso
+        la prenotazione deve essere effettuata da un genitore o da chi esercita
+        la responsabilità genitoriale, che fornisce i propri dati di contatto.
       </p>
     </section>
 
@@ -280,7 +298,7 @@
         riporterà la data del relativo aggiornamento.
       </p>
       <p class="privacy-update-date">
-        <strong>Ultimo aggiornamento:</strong> novembre 2025
+        <strong>Ultimo aggiornamento:</strong> novembre 2026
       </p>
     </section>
   </div>

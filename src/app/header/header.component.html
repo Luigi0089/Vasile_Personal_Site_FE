@@ -97,6 +97,19 @@
             </a>
           </li>
 
+          <!-- visibile solo con sessione da amministratore -->
+          <li class="nav-item" *ngIf="isAdmin">
+            <a
+              class="nav-link active"
+              routerLink="/admin"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              (click)="closeNavbar()"
+            >
+              Dashboard
+            </a>
+          </li>
+
         </ul>
       </div>
     </div>

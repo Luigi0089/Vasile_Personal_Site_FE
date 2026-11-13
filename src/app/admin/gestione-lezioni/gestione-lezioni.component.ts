@@ -48,7 +48,10 @@ import { LezioneResponseDto } from '../../../DTO/LezioneResponseDto';
 
 type VistaLezioni =
   | 'confermate'
-  | 'da-confermare';
+  | 'da-confermare'
+  | 'prova';
+
+const STATO_CONFERMATA = 'Confermata';
 
 type CampoOrdinamento =
   | 'nomeStudente'
@@ -265,19 +268,27 @@ export class GestioneLezioniComponent implements OnInit {
     () => this.vista() === 'confermate'
   );
 
-  readonly titoloPagina = computed(
-    () =>
-      this.mostraConfermate()
-        ? 'Lezioni confermate'
-        : 'Lezioni da confermare'
-  );
+  readonly titoloPagina = computed(() => {
+    switch (this.vista()) {
+      case 'confermate':
+        return 'Lezioni confermate';
+      case 'prova':
+        return 'Lezioni di prova';
+      default:
+        return 'Lezioni da confermare';
+    }
+  });
 
-  readonly descrizionePagina = computed(
-    () =>
-      this.mostraConfermate()
-        ? 'Consulta e organizza le lezioni già confermate.'
-        : 'Controlla le richieste ricevute che devono ancora essere confermate.'
-  );
+  readonly descrizionePagina = computed(() => {
+    switch (this.vista()) {
+      case 'confermate':
+        return 'Consulta e organizza le lezioni già confermate.';
+      case 'prova':
+        return 'Prime lezioni di un\'ora prenotate dai nuovi studenti, confermate e da confermare.';
+      default:
+        return 'Controlla le richieste ricevute che devono ancora essere confermate.';
+    }
+  });
 
   readonly etichettaSettimana = computed(() => {
     const data =
@@ -788,6 +799,14 @@ export class GestioneLezioniComponent implements OnInit {
       });
   }
 
+  /*
+   * Lo stato si legge dalla singola lezione: nella vista "prova"
+   * convivono lezioni confermate e da confermare.
+   */
+  isConfermata(lezione: LezioneResponseDto): boolean {
+    return lezione.stato === STATO_CONFERMATA;
+  }
+
   isRigaBloccata(id: string): boolean {
     return this.azioneInCorso()?.id === id;
   }
@@ -955,16 +974,14 @@ export class GestioneLezioniComponent implements OnInit {
     this.loading.set(true);
     this.errore.set(null);
 
+    const data = this.dataRiferimento();
+
     const richiesta$ =
-      this.mostraConfermate()
-        ? this.adminService
-          .getLezioniConfermate(
-            this.dataRiferimento()
-          )
-        : this.adminService
-          .getLezioniDaConfermare(
-            this.dataRiferimento()
-          );
+      this.vista() === 'confermate'
+        ? this.adminService.getLezioniConfermate(data)
+        : this.vista() === 'prova'
+          ? this.adminService.getLezioniDiProva(data)
+          : this.adminService.getLezioniDaConfermare(data);
 
     richiesta$
       .pipe(
@@ -1009,9 +1026,7 @@ export class GestioneLezioniComponent implements OnInit {
           this.lezioni.set([]);
 
           this.errore.set(
-            this.mostraConfermate()
-              ? 'Non è stato possibile caricare le lezioni confermate.'
-              : 'Non è stato possibile caricare le lezioni da confermare.'
+            `Non è stato possibile caricare le ${this.titoloPagina().toLowerCase()}.`
           );
         }
       });
@@ -1173,8 +1188,8 @@ export class GestioneLezioniComponent implements OnInit {
   private normalizzaVista(
     vista: string | null
   ): VistaLezioni {
-    return vista === 'confermate'
-      ? 'confermate'
+    return vista === 'confermate' || vista === 'prova'
+      ? vista
       : 'da-confermare';
   }
 

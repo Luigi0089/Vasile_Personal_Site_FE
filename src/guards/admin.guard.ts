@@ -6,7 +6,7 @@ import {
 
 import { AuthService } from '../Service/auth.service';
 
-export const adminGuard: CanActivateFn = () => {
+export const adminGuard: CanActivateFn = (_route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
@@ -14,7 +14,12 @@ export const adminGuard: CanActivateFn = () => {
     return true;
   }
 
-  return router.createUrlTree([
-    '/admin/login'
-  ]);
+  /*
+   * Ricorda la pagina richiesta (es. il link "Gestisci dalla dashboard"
+   * della mail), così dopo il login si torna lì.
+   */
+  return router.createUrlTree(
+    ['/admin/login'],
+    { queryParams: { returnUrl: state.url } }
+  );
 };

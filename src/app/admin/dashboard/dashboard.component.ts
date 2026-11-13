@@ -42,12 +42,16 @@ export class DashboardComponent implements OnInit {
     }
   );
 
+  // data ISO per i link verso /admin/lezioni (che si aspetta yyyy-MM-dd)
+  readonly todayISO = format(new Date(), 'yyyy-MM-dd');
+
   readonly statistics = signal<DashboardStatsDto>({
     skills: 0,
     categories: 0,
     keywords: 0,
     lezioniConfermate: 0,
-    lezioniDaConfermare: 0
+    lezioniDaConfermare: 0,
+    lezioniDiProva: 0
   });
 
   readonly loadingStatistics = signal(true);

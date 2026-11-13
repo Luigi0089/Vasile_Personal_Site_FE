@@ -1,4 +1,4 @@
-@use '../../../styles' as *;
+@use '../../../tokens' as *;
 
 :host {
   --dashboard-header-height: 114px;
@@ -462,7 +462,7 @@
 
 .lessons-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 
   gap: 1rem;
 }
@@ -748,6 +748,56 @@
 }
 
 /* ==================================================
+   LEZIONI DI PROVA
+================================================== */
+
+$trial: #8fb4ff;
+
+.lesson-card.trial {
+  border-color: rgba($trial, 0.16);
+
+  background:
+    linear-gradient(
+        135deg,
+        rgba($trial, 0.03),
+        transparent 55%
+    ),
+    rgba(255, 255, 255, 0.018);
+
+  &::after {
+    border-color: rgba($trial, 0.08);
+  }
+
+  .lesson-icon {
+    border-color: rgba($trial, 0.3);
+    color: $trial;
+    background: rgba($trial, 0.06);
+  }
+
+  .lesson-status {
+    border-color: rgba($trial, 0.24);
+    color: $trial;
+    background: rgba($trial, 0.055);
+  }
+
+  &:hover {
+    border-color: rgba($trial, 0.36);
+  }
+}
+
+.lesson-card.trial.has-trial-lessons {
+  border-color: rgba($trial, 0.34);
+
+  box-shadow:
+    0 0 0 1px rgba($trial, 0.025),
+    0 1.2rem 3rem rgba($trial, 0.05);
+
+  .lesson-value {
+    color: $trial;
+  }
+}
+
+/* ==================================================
    AZIONI RAPIDE
 ================================================== */
 
@@ -880,6 +930,12 @@
 /* ==================================================
    RESPONSIVE TABLET
 ================================================== */
+
+@media (max-width: 1200px) and (min-width: 901px) {
+  .lessons-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 
 @media (max-width: 900px) {
   :host {

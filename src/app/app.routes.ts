@@ -11,6 +11,8 @@ import {LoginComponent} from './admin/login/login.component';
 import { DashboardComponent} from './admin/dashboard/dashboard.component';
 import { adminGuard } from '../guards/admin.guard';
 import {GestioneLezioniComponent} from "./admin/gestione-lezioni/gestione-lezioni.component";
+import { GestioneContenutiComponent } from './admin/gestione-contenuti/gestione-contenuti.component';
+import { CookiePolicyComponent } from './public/cookie-policy/cookie-policy.component';
 
 export const routes: Routes = [
 
@@ -65,6 +67,21 @@ export const routes: Routes = [
     pathMatch: 'full'
   },
 
+  /*
+   * Lezione di prova: stessa pagina di /Lezioni in modalità prova.
+   * Link da condividere: /Lezioni?prova=true (oppure gli alias qui sotto).
+   */
+  {
+    path: 'prima-lezione',
+    redirectTo: '/Lezioni?prova=true',
+    pathMatch: 'full'
+  },
+  {
+    path: 'lezione-di-prova',
+    redirectTo: '/Lezioni?prova=true',
+    pathMatch: 'full'
+  },
+
   {
     path: 'conferma',
     component: AccettazioneLezioneComponent
@@ -78,6 +95,11 @@ export const routes: Routes = [
   {
     path: 'privacy',
     component: PrivacyComponent
+  },
+
+  {
+    path: 'cookie-policy',
+    component: CookiePolicyComponent
   },
 
   // ======================
@@ -99,6 +121,27 @@ export const routes: Routes = [
     path: 'admin/lezioni',
     component: GestioneLezioniComponent,
     canActivate: [adminGuard]
+  },
+
+  {
+    path: 'admin/skills',
+    component: GestioneContenutiComponent,
+    canActivate: [adminGuard],
+    data: { sezione: 'skills' }
+  },
+
+  {
+    path: 'admin/categories',
+    component: GestioneContenutiComponent,
+    canActivate: [adminGuard],
+    data: { sezione: 'categories' }
+  },
+
+  {
+    path: 'admin/keywords',
+    component: GestioneContenutiComponent,
+    canActivate: [adminGuard],
+    data: { sezione: 'keywords' }
   },
 
 

@@ -2,6 +2,8 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
+import { AuthService } from '../../Service/auth.service';
+
 @Component({
   selector: 'app-header',
   standalone: true,
@@ -20,7 +22,15 @@ export class HeaderComponent {
 
   dropdownOpen = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
+
+  /*
+   * Legge la sessione a ogni change detection: così il link compare
+   * subito dopo il login e sparisce dopo il logout, senza ricaricare.
+   */
+  get isAdmin(): boolean {
+    return typeof window !== 'undefined' && this.authService.isAdmin();
+  }
 
   /**
    * Chiude il menù a scomparsa (burger) sui dispositivi piccoli

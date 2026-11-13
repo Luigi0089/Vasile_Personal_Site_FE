@@ -4,4 +4,5 @@ export interface DashboardStatsDto {
   keywords: number;
   lezioniConfermate: number;
   lezioniDaConfermare: number;
+  lezioniDiProva: number;
 }

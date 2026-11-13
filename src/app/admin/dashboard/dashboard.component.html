@@ -119,11 +119,10 @@
           </div>
 
           <a
-            routerLink="/admin/lezioni"
             [routerLink]="['/admin/lezioni']"
             [queryParams]="{
                             vista: 'confermate',
-                            data: currentDate
+                            data: todayISO
                           }"
           >
             Gestisci lezioni
@@ -178,10 +177,65 @@
             routerLink="/admin/lezioni"
             [queryParams]="{
                             vista: 'da-confermare',
-                            data: currentDate
+                            data: todayISO
                           }"
           >
             Gestisci prenotazioni
+            <span aria-hidden="true">→</span>
+          </a>
+
+        </article>
+
+        <!-- LEZIONI DI PROVA -->
+        <article
+          class="lesson-card trial"
+          [class.has-trial-lessons]="
+            !loadingStatistics() &&
+            statistics().lezioniDiProva > 0
+          "
+        >
+
+          <div class="lesson-card-header">
+
+            <div class="lesson-icon" aria-hidden="true">
+              ★
+            </div>
+
+            <span class="lesson-status">
+              Di prova
+            </span>
+
+          </div>
+
+          <div class="lesson-value">
+            @if (loadingStatistics()) {
+              <span class="value-placeholder"></span>
+            } @else {
+              {{ statistics().lezioniDiProva }}
+            }
+          </div>
+
+          <div class="lesson-card-content">
+
+            <h3>
+              Lezioni di prova
+            </h3>
+
+            <p>
+              Prime lezioni da un'ora prenotate dai nuovi studenti
+              per la settimana corrente.
+            </p>
+
+          </div>
+
+          <a
+            routerLink="/admin/lezioni"
+            [queryParams]="{
+                            vista: 'prova',
+                            data: todayISO
+                          }"
+          >
+            Gestisci lezioni di prova
             <span aria-hidden="true">→</span>
           </a>
 
@@ -325,6 +379,7 @@
 
         <a
           routerLink="/admin/skills"
+          [queryParams]="{ nuovo: true }"
           class="action-card"
         >
           <span class="action-icon" aria-hidden="true">
@@ -346,6 +401,7 @@
 
         <a
           routerLink="/admin/categories"
+          [queryParams]="{ nuovo: true }"
           class="action-card"
         >
           <span class="action-icon" aria-hidden="true">
@@ -367,6 +423,7 @@
 
         <a
           routerLink="/admin/keywords"
+          [queryParams]="{ nuovo: true }"
           class="action-card"
         >
           <span class="action-icon" aria-hidden="true">

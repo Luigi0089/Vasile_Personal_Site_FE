@@ -55,8 +55,20 @@ export class LoginComponent {
 
   constructor() {
     if (this.authService.isAdmin()) {
-      void this.router.navigateByUrl('/admin');
+      void this.router.navigateByUrl(this.urlDopoLogin());
     }
+  }
+
+  /*
+   * Pagina a cui tornare dopo il login (impostata dall'adminGuard).
+   * Accetto solo percorsi interni dell'area admin, per evitare open redirect.
+   */
+  private urlDopoLogin(): string {
+    const returnUrl = this.router.parseUrl(this.router.url).queryParams['returnUrl'];
+
+    return typeof returnUrl === 'string' && /^\/admin(\/|\?|$)/.test(returnUrl) && !returnUrl.startsWith('/admin/login')
+      ? returnUrl
+      : '/admin';
   }
 
   togglePasswordVisibility(): void {
@@ -92,7 +104,7 @@ export class LoginComponent {
             return;
           }
 
-          void this.router.navigateByUrl('/admin');
+          void this.router.navigateByUrl(this.urlDopoLogin());
         },
 
         error: (error: HttpErrorResponse) => {

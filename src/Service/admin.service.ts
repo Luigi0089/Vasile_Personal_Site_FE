@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { API_PATHS } from '../Constants/ApiPaths';
-import { Skill } from '../DTO/Skill';
+import { Skill, SkillRequest } from '../DTO/Skill';
 import { CategoryDto } from '../DTO/CategoryDto';
 import { KeywordDto } from '../DTO/KeywordDto';
 import { DashboardStatsDto } from '../DTO/DashboardStatsDto';
@@ -58,7 +58,7 @@ export class AdminService {
   //       SKILL
   // ======================
 
-  createSkill(skill: Skill): Observable<Skill> {
+  createSkill(skill: SkillRequest): Observable<Skill> {
     return this.http.post<Skill>(
       `${this.BASE}/skills`,
       skill
@@ -67,7 +67,7 @@ export class AdminService {
 
   updateSkill(
     id: number,
-    skill: Skill
+    skill: SkillRequest
   ): Observable<Skill> {
     return this.http.put<Skill>(
       `${this.BASE}/skills/${id}`,
@@ -173,6 +173,14 @@ export class AdminService {
     const params = new HttpParams().set('data', data);
     return this.http.get<LezioneResponseDto[]>(
       `${this.BASE}/settimana/da/confermare`,
+      {params}
+    );
+  }
+
+  getLezioniDiProva(data: string): Observable<LezioneResponseDto[]> {
+    const params = new HttpParams().set('data', data);
+    return this.http.get<LezioneResponseDto[]>(
+      `${this.BASE}/settimana/prova`,
       {params}
     );
   }

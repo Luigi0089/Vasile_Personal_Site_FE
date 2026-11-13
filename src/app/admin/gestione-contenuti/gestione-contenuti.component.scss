@@ -1,0 +1,147 @@
+@use '../../../tokens' as *;
+
+/* Layout, card, tabelle e bottoni arrivano da gestione-lezioni.component.scss */
+
+.status-switch .section-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-height: 4.6rem;
+  padding: 0.9rem 1.15rem;
+  border: 1px solid transparent;
+  border-radius: 0.9rem;
+  color: $muted;
+  text-decoration: none;
+  transition:
+    color 170ms ease,
+    border-color 170ms ease,
+    background-color 170ms ease;
+
+  &:hover {
+    color: $fg;
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  &.active {
+    color: $fg;
+    border-color: rgba($accent, 0.34);
+    background: linear-gradient(135deg, rgba($accent, 0.1), rgba($accent, 0.025));
+  }
+}
+
+.content-form {
+  padding-top: 0.25rem;
+}
+
+.modal-field {
+  select {
+    width: 100%;
+    height: 2.8rem;
+    padding: 0 0.8rem;
+    border: 1px solid $line;
+    border-radius: 0.75rem;
+    color: $fg;
+    color-scheme: dark;
+    background: #101116;
+    outline: none;
+    cursor: pointer;
+
+    &:focus {
+      border-color: rgba($accent, 0.75);
+      box-shadow: 0 0 0 3px rgba($accent, 0.08);
+    }
+  }
+
+  .field-invalid {
+    border-color: rgba(239, 140, 140, 0.6);
+  }
+}
+
+.picker-count {
+  margin-left: 0.5rem;
+  color: rgba($muted, 0.75);
+  font-size: 0.65rem;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.picker-search {
+  height: 2.4rem !important;
+  max-width: 20rem;
+}
+
+.chip-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding: 0.75rem;
+  border: 1px solid $line;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.012);
+
+  &--scroll {
+    max-height: 12rem;
+    overflow-y: auto;
+    scrollbar-color: rgba($accent, 0.5) rgba(255, 255, 255, 0.04);
+    scrollbar-width: thin;
+  }
+
+  a {
+    color: $accent;
+  }
+}
+
+.chip {
+  padding: 0.38rem 0.7rem;
+  border: 1px solid $line !important;
+  border-radius: 999px;
+  color: $muted;
+  background: rgba(255, 255, 255, 0.025);
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 700;
+  transition:
+    color 140ms ease,
+    border-color 140ms ease,
+    background-color 140ms ease;
+
+  &:hover {
+    color: $fg;
+    border-color: rgba($accent, 0.4) !important;
+  }
+
+  &--selected {
+    color: #0b0c10;
+    border-color: $accent !important;
+    background: $accent;
+
+    &:hover {
+      color: #0b0c10;
+    }
+  }
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.cell-title {
+  color: $fg;
+  font-weight: 750;
+}
+
+.confirm-text {
+  color: #ef8c8c;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.lesson-action:disabled {
+  cursor: not-allowed;
+}
+
+tbody tr.row-editing {
+  background: rgba($accent, 0.04);
+}

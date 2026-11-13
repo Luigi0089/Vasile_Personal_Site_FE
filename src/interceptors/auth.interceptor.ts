@@ -19,7 +19,7 @@ export const authInterceptor: HttpInterceptorFn = (
   const token = authService.getToken();
 
   const publicAdminEndpoints = [
-    `${API_PATHS.ADMIN}/ping`,
+    `${API_PATHS.AUTH}/ping`,
     // `${API_PATHS.ADMIN}/conferma`,
     // `${API_PATHS.ADMIN}/rifiuta`
   ];

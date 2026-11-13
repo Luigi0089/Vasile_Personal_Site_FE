@@ -1,0 +1,73 @@
+/* Layout e tipografia arrivano da privacy.component.scss */
+
+.storage-table-wrapper {
+  margin: 14px 0;
+  overflow-x: auto;
+}
+
+.storage-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  th,
+  td {
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    text-align: left;
+    vertical-align: top;
+    color: #e2e2e2;
+  }
+
+  thead th {
+    color: #f5d77a;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  code {
+    font-size: 0.85rem;
+    color: #ffdd7a;
+    word-break: break-all;
+  }
+}
+
+/* su schermi stretti ogni riga diventa una scheda con le etichette */
+@media (max-width: 700px) {
+  .storage-table {
+    thead {
+      display: none;
+    }
+
+    tr,
+    th,
+    td {
+      display: block;
+    }
+
+    tr {
+      margin-bottom: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      border: 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    [data-label]::before {
+      content: attr(data-label);
+      display: block;
+      margin-bottom: 2px;
+      color: #a3a3a3;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+  }
+}

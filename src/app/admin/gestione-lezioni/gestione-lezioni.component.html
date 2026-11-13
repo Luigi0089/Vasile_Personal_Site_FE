@@ -115,6 +115,35 @@
 
       </button>
 
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="vista() === 'prova'"
+        [class.active]="vista() === 'prova'"
+        (click)="cambiaVista('prova')"
+      >
+
+        <span
+          class="tab-icon tab-icon--trial"
+          aria-hidden="true"
+        >
+          ★
+        </span>
+
+        <span class="tab-copy">
+
+          <strong>
+            Di prova
+          </strong>
+
+          <small>
+            Prime lezioni da un'ora
+          </small>
+
+        </span>
+
+      </button>
+
     </nav>
 
     <!-- SELETTORE SETTIMANA -->
@@ -707,6 +736,13 @@
                   {{ lezione.materia }}
                 </span>
 
+                <span
+                  *ngIf="lezione.lezioneDiProva"
+                  class="trial-badge"
+                >
+                  ★ Prova
+                </span>
+
             </td>
 
             <!-- LIVELLO -->
@@ -743,10 +779,10 @@
                 <span
                   class="status-badge"
                   [class.status-badge--confirmed]="
-                    mostraConfermate()
+                    isConfermata(lezione)
                   "
                   [class.status-badge--pending]="
-                    !mostraConfermate()
+                    !isConfermata(lezione)
                   "
                 >
 
@@ -757,7 +793,7 @@
                   </span>
 
                   {{
-                    mostraConfermate()
+                    isConfermata(lezione)
                       ? 'Confermata'
                       : 'Da confermare'
                   }}
@@ -775,7 +811,7 @@
               <div class="lesson-actions">
 
                 <button
-                  *ngIf="!mostraConfermate()"
+                  *ngIf="!isConfermata(lezione)"
                   type="button"
                   class="lesson-action lesson-action--confirm"
                   [disabled]="isRigaBloccata(lezione.id)"
