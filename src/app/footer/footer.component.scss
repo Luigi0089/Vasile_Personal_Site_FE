@@ -186,3 +186,21 @@
 .copy {
   color: #fff;
 }
+
+.legal-links {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .85rem;
+
+  a {
+    color: inherit;
+    opacity: .8;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}

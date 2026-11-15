@@ -11,5 +11,7 @@ export interface LezioneResponseDto {
   orarioFine: string;       // HH:mm:ss
 
   codiceModifica?: string;
-  stato?: string;
+  stato?: string;           // "Confermata" | "In approvazione" | "Annullata"
+
+  lezioneDiProva?: boolean;
 }

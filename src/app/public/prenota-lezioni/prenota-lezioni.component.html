@@ -1,0 +1,421 @@
+<!-- Intro modalità lezione di prova (solo da link dedicato ?prova=true) -->
+<section class="intro-prova" *ngIf="isProva">
+  <span class="intro-eyebrow">Prima volta?</span>
+  <h1>Prenota la tua lezione di prova GRATUITA</h1>
+  <p>
+    Scegli uno degli slot liberi: la lezione di prova dura
+    <strong>esattamente un'ora</strong>. Riceverai un'email di riepilogo
+    e una successiva conferma.
+  </p>
+</section>
+
+<div id="lezioni" class="week-toolbar" [class.week-toolbar--prova]="isProva">
+  <button (click)="goPrevWeek()" class="btn-nav">‹</button>
+  <div class="title">
+    {{ weekStart | date:'dd/MM' }} – {{ weekEnd | date:'dd/MM' }}
+  </div>
+  <button (click)="goNextWeek()" class="btn-nav">›</button>
+</div>
+
+<!-- Privacy Modal -->
+<div class="privacy-modal-wrapper" *ngIf="privacyModalOpen">
+  <div class="privacy-modal">
+    <h2>Informativa sulla Privacy</h2>
+
+    <div class="privacy-text">
+      <p>
+        Ai sensi del Regolamento (UE) 2016/679 (“GDPR”) dichiaro di aver letto
+        l’informativa privacy. I dati inseriti nel modulo saranno usati al solo
+        scopo di gestire la richiesta di prenotazione della lezione e inviare le
+        comunicazioni organizzative connesse.
+      </p>
+      <p>
+        I dati saranno conservati per il tempo necessario alla gestione della
+        lezione e poi cancellati. Saranno comunicati solo ai fornitori tecnici
+        indispensabili al servizio (hosting ed e-mail), salvo obblighi di legge.
+        Potrò in qualsiasi momento esercitare i miei diritti di accesso, rettifica,
+        cancellazione, limitazione e opposizione scrivendo a
+        <strong>luigifravasile&#64;gmail.com</strong>.
+      </p>
+      <p>
+        Ho preso visione dell’informativa completa disponibile al seguente link:
+        <a routerLink="/privacy" target="_blank">Informativa Privacy completa</a>.
+      </p>
+    </div>
+
+    <button class="btn-primary" (click)="acceptPrivacy()">
+      Accetto e procedo
+    </button>
+  </div>
+</div>
+
+
+
+<div class="notice" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+<div class="legenda">
+  <ng-container *ngIf="!isProva; else legendaProva">
+    <span><i class="dot dot--free"></i> Libero</span>
+    <span><i class="dot dot--pending"></i> Da confermare</span>
+    <span><i class="dot dot--confirmed"></i> Confermata</span>
+  </ng-container>
+
+  <ng-template #legendaProva>
+    <span><i class="dot dot--free"></i> Libero</span>
+    <span><i class="dot dot--unavailable"></i> Non disponibile</span>
+  </ng-template>
+</div>
+
+<div class="grid" [class.grid--prova]="isProva" *ngIf="grid.length && grid[0].length">
+  <!-- header giorni -->
+  <div class="col header"></div>
+  <div class="col header" *ngFor="let d of daysISO; let i = index">
+    {{ dayHeader(i) }}
+  </div>
+
+  <!-- righe slot (numero massimo di righe tra i giorni) -->
+  <ng-container *ngFor="let rowIdx of grid[0]; let r = index">
+    <div class="row">
+      <div class="col rowtime">
+        {{ grid[0][r].label }}
+      </div>
+      <div class="col cell"
+           *ngFor="let dayCol of grid"
+           [class.empty]="!dayCol[r]"
+           [class.busy]="!!dayCol[r] && dayCol[r].busy && !isProva"
+           [class.unavailable]="!!dayCol[r] && dayCol[r].busy && isProva"
+           [class.confirmed]="!!dayCol[r] && !isProva && statoSlot(dayCol[r]) === 'confirmed'"
+           [class.pending]="!!dayCol[r] && !isProva && statoSlot(dayCol[r]) === 'pending'"
+           [class.free]="isPrenotabile(dayCol[r])"
+           [class.past]="isPastSlot(dayCol[r])"
+           (click)="onClickSlot(dayCol[r])">
+        <ng-container *ngIf="dayCol[r] as s">
+          <div class="slot-label" *ngIf="!s.busy">Libero</div>
+
+          <!-- modalità normale: si vede la materia, per poter modificare con il codice -->
+          <div class="slot-booked"
+               *ngIf="s.busy && !isProva"
+               [title]="s.bookedBy?.materia || 'Prenotato'">
+            {{ s.bookedBy?.materia  || 'Prenotato' }}
+          </div>
+
+          <div class="slot-unavailable" *ngIf="s.busy && isProva">Non disponibile</div>
+        </ng-container>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<!-- MODALE -->
+<div class="lezione-modal-wrapper" *ngIf="modalOpen">
+  <div class="lezione-modal-backdrop" (click)="closeModal()"></div>
+
+  <div class="lezione-modal" (click)="$event.stopPropagation()">
+    <div class="modal-title">
+      <h3>{{ isEdit ? 'Modifica lezione' : (isProva ? 'Lezione di prova' : 'Prenota lezione') }}</h3>
+
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-grid">
+
+          <!-- Studente (solo in creazione: in modifica non è esposto) -->
+          <div class="form-field" *ngIf="!isEdit">
+            <label>Nome *</label>
+            <input
+              formControlName="nomeStudente"
+              placeholder="Mario"
+              [ngClass]="{ 'field-error': showError('nomeStudente') }"
+            >
+
+            <!-- obbligatorio -->
+            <div class="error-msg" *ngIf="showError('nomeStudente') && form.get('nomeStudente')?.hasError('required')">
+              Il nome dello studente è obbligatorio.
+            </div>
+
+            <!-- parolacce -->
+            <div class="error-msg" *ngIf="form.get('nomeStudente')?.hasError('profanity')">
+              Il nome inserito contiene termini non appropriati.
+            </div>
+          </div>
+
+
+          <!-- Email -->
+          <div class="form-field" *ngIf="!isEdit">
+            <label>Email *</label>
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="es. mario.rossi@gmail.com"
+              [ngClass]="{ 'field-error': showError('email') }"
+            >
+            <div class="error-msg" *ngIf="showError('email')">
+              L'email è obbligatoria e deve essere valida.
+            </div>
+          </div>
+
+          <!-- Materia -->
+          <div class="form-field">
+            <label>Materia *</label>
+            <input
+              formControlName="materia"
+              placeholder="Analisi 1"
+              [ngClass]="{ 'field-error': showError('materia') }"
+            >
+
+            <!-- obbligatoria -->
+            <div class="error-msg" *ngIf="showError('materia') && form.get('materia')?.hasError('required')">
+              La materia è obbligatoria.
+            </div>
+
+            <!-- parolacce -->
+            <div class="error-msg" *ngIf="form.get('materia')?.hasError('profanity')">
+              La materia contiene termini non appropriati.
+            </div>
+          </div>
+
+
+          <!-- Livello -->
+          <div class="form-field">
+            <label>Livello</label>
+            <select
+              formControlName="livello"
+              [ngClass]="{ 'field-error': showError('livello') }"
+            >
+              <option *ngFor="let l of livelli" [value]="l.value">{{ l.label }}</option>
+            </select>
+            <div class="error-msg" *ngIf="showError('livello')">
+              Il livello è obbligatorio.
+            </div>
+          </div>
+
+          <!-- Data (in prova è quella dello slot scelto: la disponibilità è calcolata sulla settimana visualizzata) -->
+          <div class="form-field full">
+            <label>Data *</label>
+            <input
+              formControlName="dataLezione"
+              type="date"
+              [readonly]="isProvaCreazione"
+              [ngClass]="{ 'field-error': showError('dataLezione') }"
+            >
+            <div class="error-msg" *ngIf="showError('dataLezione')">
+              La data è obbligatoria.
+            </div>
+          </div>
+
+          <!-- Inizio -->
+          <div class="form-field">
+            <label>Inizio *</label>
+
+            <!-- lezione normale: tutti gli orari, i conflitti li segnala il BE -->
+            <select
+              *ngIf="!isProvaCreazione"
+              formControlName="orarioInizio"
+              [ngClass]="{ 'field-error': showError('orarioInizio') }">
+              <option value="" disabled>Seleziona orario</option>
+              <option *ngFor="let t of timeOptions" [value]="t + ':00'">
+                {{ t }}
+              </option>
+            </select>
+
+            <!-- lezione di prova: inizi ogni mezz'ora, disabilitati se l'ora successiva non è libera -->
+            <select
+              *ngIf="isProvaCreazione"
+              formControlName="orarioInizio"
+              [ngClass]="{ 'field-error': showError('orarioInizio') }">
+              <option value="" disabled>Seleziona orario</option>
+              <option *ngFor="let o of opzioniInizioProva"
+                      [value]="o.start"
+                      [disabled]="!o.disponibile">
+                {{ o.label }}{{ o.disponibile ? '' : ' — non disponibile' }}
+              </option>
+            </select>
+
+            <div class="error-msg" *ngIf="showError('orarioInizio')">
+              L'orario di inizio è obbligatorio.
+            </div>
+          </div>
+
+
+          <!-- Fine -->
+          <div class="form-field">
+            <label>Fine *</label>
+
+            <select
+              *ngIf="!isProvaCreazione"
+              formControlName="orarioFine"
+              [ngClass]="{ 'field-error': showError('orarioFine') }">
+              <option value="" disabled>Seleziona orario</option>
+              <option *ngFor="let t of timeOptions" [value]="t + ':00'">
+                {{ t }}
+              </option>
+            </select>
+
+            <!-- lezione di prova: fine calcolata, sempre un'ora dopo l'inizio -->
+            <input
+              *ngIf="isProvaCreazione"
+              type="text"
+              readonly
+              class="input-readonly"
+              [value]="formattaOra(form.value.orarioFine) || '—'"
+            >
+            <small class="field-hint" *ngIf="isProvaCreazione">La lezione di prova dura 1 ora.</small>
+
+            <div class="error-msg" *ngIf="showError('orarioFine')">
+              L'orario di fine è obbligatorio.
+            </div>
+          </div>
+
+
+          <!-- Note (non obbligatorie) -->
+          <div class="form-field full">
+            <label>{{ isEdit ? 'Nuove note (lascia vuoto per mantenere quelle attuali)' : 'Note' }}</label>
+            <textarea
+              formControlName="note"
+              rows="2"
+              [placeholder]="isProva ? 'Raccontami brevemente cosa vorresti affrontare' : 'Preferisco esercizi sui limiti'"
+              [ngClass]="{ 'field-error': form.get('note')?.hasError('profanity') && form.get('note')?.touched }"
+            ></textarea>
+
+            <div class="error-msg" *ngIf="form.get('note')?.hasError('profanity') && form.get('note')?.touched">
+              Le note contengono termini non appropriati.
+            </div>
+          </div>
+
+
+          <!-- Codice modifica (solo in edit) -->
+          <div class="form-field full" *ngIf="isEdit">
+            <label>Codice modifica *</label>
+            <input
+              formControlName="codiceModifica"
+              placeholder="Inserisci il codice di modifica"
+              [ngClass]="{ 'field-error': showError('codiceModifica') }"
+            >
+
+            <!-- Obbligatorio -->
+            <div class="error-msg"
+                 *ngIf="form.get('codiceModifica')?.hasError('required') && showError('codiceModifica')">
+              Il codice di modifica è obbligatorio per modificare la lezione.
+            </div>
+
+            <!-- Errato lato backend -->
+            <div class="error-msg"
+                 *ngIf="form.get('codiceModifica')?.hasError('invalidCode')
+              && !form.get('codiceModifica')?.hasError('required')">
+              Il codice di modifica inserito non è corretto.
+            </div>
+          </div>
+
+      </div>
+
+      <!-- conflitto con suggerimenti -->
+      <div class="conflict" *ngIf="conflict as c">
+        <div class="conflict-title">Conflitto</div>
+        <div class="conflict-msg">{{ c.message }}</div>
+        <div class="conflict-slots" *ngIf="c.fasceDisponibili?.length">
+          <div class="suggerimento" *ngFor="let f of c.fasceDisponibili">
+            Suggerimento: {{ f.orarioInizio }} – {{ f.orarioFine }}
+          </div>
+        </div>
+      </div>
+
+      <p class="required-hint">
+        I campi contrassegnati con <span class="asterisk">*</span> sono obbligatori.
+      </p>
+
+      <div class="actions">
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="loading || form.invalid"
+          [ngClass]="{ 'btn-disabled': loading || form.invalid }">
+          {{ isEdit ? 'Salva modifiche' : (isProva ? 'Prenota lezione di prova' : 'Prenota') }}
+        </button>
+
+        <button
+          type="button"
+          class="btn-secondary"
+          (click)="closeModal()">
+          Annulla modifiche
+        </button>
+
+        <button
+          type="button"
+          class="btn-danger"
+          *ngIf="isEdit && form.value.id"
+          [disabled]="loading || !form.value.codiceModifica"
+          [ngClass]="{ 'btn-disabled': loading || !form.value.codiceModifica }"
+          (click)="annulla(form.value.id!)">
+          Annulla lezione
+        </button>
+
+      </div>
+
+    </form>
+  </div>
+</div>
+
+
+<!-- MODALE SUCCESSO -->
+<div class="lezione-success-wrapper" *ngIf="successModalOpen">
+  <div class="lezione-success-backdrop" (click)="closeSuccessModal()"></div>
+
+  <div class="lezione-success-modal" (click)="$event.stopPropagation()">
+    <div class="lezione-success-header">
+      <h3>{{ lastBooking?.lezioneDiProva ? 'Lezione di prova prenotata' : 'Prenotazione confermata' }}</h3>
+      <button class="lezione-success-close" (click)="closeSuccessModal()">✕</button>
+    </div>
+
+    <div class="success-body" *ngIf="lastBooking as b">
+      <p>La tua lezione è stata prenotata correttamente 🎉</p>
+
+      <!-- AVVISO EMAIL / SPAM -->
+      <p class="mail-notice">
+        Ti abbiamo inviato un'email di riepilogo con tutti i dettagli della prenotazione.
+        Ti chiediamo gentilmente di controllare anche la cartella <strong>Spam</strong> o
+        <strong>Posta indesiderata</strong> per assicurarti di ricevere gli aggiornamenti
+        sullo stato della richiesta.
+      </p>
+
+      <ul class="riepilogo">
+        <li><strong>Studente:</strong> {{ b.nomeStudente }}</li>
+        <li><strong>Materia:</strong> {{ b.materia }}</li>
+        <li><strong>Livello:</strong> {{ b.livello }}</li>
+        <li><strong>Data:</strong> {{ b.dataLezione }}</li>
+        <li><strong>Orario:</strong> {{ b.orarioInizio }} – {{ b.orarioFine }}</li>
+
+        <!-- STATO DELLA RICHIESTA -->
+        <li>
+          <strong>Stato della richiesta:</strong>
+          {{ b.stato || 'In attesa di conferma da parte del docente' }}
+        </li>
+      </ul>
+
+      <div class="codice-modifica-box" *ngIf="b.codiceModifica">
+        <div class="label">
+          Questo è il tuo <strong>codice di modifica</strong>.<br>
+          <span>Conservalo con cura: ti servirà per modificare o annullare la lezione.</span>
+        </div>
+        <div class="codice">
+          {{ b.codiceModifica }}
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn-primary" (click)="closeSuccessModal()">
+          Ho salvato il codice
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Overlay di caricamento -->
+<div class="loading-overlay" *ngIf="loading">
+  <div class="loading-spinner"></div>
+</div>
+
+
+
+

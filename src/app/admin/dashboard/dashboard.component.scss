@@ -1,0 +1,1054 @@
+@use '../../../tokens' as *;
+
+:host {
+  --dashboard-header-height: 114px;
+
+  display: block;
+
+  min-height: calc(
+    100dvh - var(--dashboard-header-height)
+  );
+}
+
+/* ==================================================
+   PAGINA
+================================================== */
+
+.dashboard-page {
+  min-height: calc(
+    100dvh - var(--dashboard-header-height)
+  );
+
+  padding: 1.5rem;
+
+  color: $fg;
+
+  background:
+    radial-gradient(
+        circle at 5% 10%,
+        rgba($accent, 0.055),
+        transparent 28rem
+    ),
+    radial-gradient(
+        circle at 95% 90%,
+        rgba($accent, 0.025),
+        transparent 30rem
+    ),
+    #0b0c10;
+}
+
+.dashboard-shell {
+  width: min(100%, 1500px);
+  margin-inline: auto;
+}
+
+/* ==================================================
+   HEADER DASHBOARD
+================================================== */
+
+.dashboard-header {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  align-items: flex-start;
+
+  padding: 2.5rem 3rem;
+
+  border: 1px solid rgba($accent, 0.13);
+  border-radius: 1.5rem;
+
+  background:
+    linear-gradient(
+        135deg,
+        rgba($accent, 0.045),
+        transparent 45%
+    ),
+    rgba(15, 16, 21, 0.88);
+
+  box-shadow:
+    0 1.5rem 4rem rgba(0, 0, 0, 0.22);
+}
+
+.eyebrow {
+  display: inline-block;
+
+  margin-bottom: 0.8rem;
+
+  color: $accent;
+
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.header-copy h1 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+
+  span {
+    color: $accent;
+  }
+}
+
+.header-copy p {
+  margin: 1rem 0 0;
+
+  color: $muted;
+
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.secondary-button,
+.logout-button {
+  display: inline-flex;
+  justify-content: center;
+  gap: 0.75rem;
+  align-items: center;
+
+  min-height: 2.9rem;
+
+  padding: 0.75rem 1rem;
+
+  border-radius: 0.7rem;
+
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    border-color 180ms ease,
+    color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.secondary-button {
+  border: 1px solid $line;
+
+  color: #d4d5d8;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  &:hover {
+    border-color: rgba($accent, 0.35);
+    color: $accent;
+    transform: translateY(-2px);
+  }
+}
+
+.logout-button {
+  border: 1px solid rgba($accent, 0.45);
+
+  color: #111214;
+
+  background: $accent;
+
+  &:hover {
+    border-color: $accent-2;
+    background: $accent-2;
+    transform: translateY(-2px);
+  }
+}
+
+/* ==================================================
+   DATA E STATO BACKEND
+================================================== */
+
+.dashboard-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+
+  margin: 1rem 0 1.5rem;
+  padding: 0 0.4rem;
+}
+
+.date-block {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+
+  color: $muted;
+
+  font-size: 0.78rem;
+
+  strong {
+    color: #b8bac0;
+
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+}
+
+.meta-label {
+  color: $accent;
+
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.status-block {
+  display: inline-flex;
+  gap: 0.55rem;
+  align-items: center;
+
+  color: #8b8e96;
+
+  font-size: 0.75rem;
+
+  &.online {
+    color: #9fbea4;
+  }
+
+  &.offline {
+    color: #d58c8c;
+  }
+}
+
+.status-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+
+  border-radius: 50%;
+
+  background: #777b84;
+
+  box-shadow:
+    0 0 0 4px rgba(119, 123, 132, 0.08);
+}
+
+.status-block.online .status-dot {
+  background: #78a781;
+
+  box-shadow:
+    0 0 0 4px rgba(120, 167, 129, 0.09);
+}
+
+.status-block.offline .status-dot {
+  background: #bf6666;
+
+  box-shadow:
+    0 0 0 4px rgba(191, 102, 102, 0.09);
+}
+
+/* ==================================================
+   STATISTICHE CONTENUTI
+================================================== */
+
+.statistics-grid {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 1rem;
+}
+
+.stat-card {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  min-height: 19rem;
+
+  padding: 1.6rem;
+
+  overflow: hidden;
+
+  border: 1px solid $line;
+  border-radius: 1.25rem;
+
+  background: rgba(255, 255, 255, 0.018);
+
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+
+  &::after {
+    position: absolute;
+    right: -4rem;
+    bottom: -5rem;
+
+    width: 11rem;
+    height: 11rem;
+
+    content: '';
+
+    pointer-events: none;
+
+    border: 1px solid rgba($accent, 0.07);
+    border-radius: 50%;
+
+    box-shadow:
+      0 0 0 2rem rgba($accent, 0.01);
+  }
+
+  &:hover {
+    border-color: rgba($accent, 0.3);
+
+    background: rgba($accent, 0.018);
+
+    transform: translateY(-3px);
+  }
+}
+
+.stat-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-number {
+  color: $accent;
+
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.stat-decoration {
+  width: 1.8rem;
+  height: 1px;
+
+  background: rgba($accent, 0.35);
+}
+
+.stat-value,
+.lesson-value {
+  min-height: 4.5rem;
+
+  margin-top: 1.6rem;
+
+  color: #ffffff;
+
+  font-size: 3.8rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+.value-placeholder {
+  display: block;
+
+  width: 4rem;
+  height: 3.5rem;
+
+  border-radius: 0.5rem;
+
+  background:
+    linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.025),
+        rgba(255, 255, 255, 0.075),
+        rgba(255, 255, 255, 0.025)
+    );
+
+  background-size: 200% 100%;
+
+  animation: placeholder-loading 1.4s infinite;
+}
+
+.stat-card h2 {
+  margin: 1rem 0 0;
+
+  color: #e5e6e8;
+
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.stat-card p {
+  margin: 0.5rem 0 1.5rem;
+
+  color: $muted;
+
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.stat-card a {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-top: auto;
+  padding-top: 1rem;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.055);
+
+  color: #c7c9ce;
+
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  transition: color 180ms ease;
+
+  &:hover {
+    color: $accent;
+  }
+}
+
+/* ==================================================
+   HEADER DELLE SEZIONI
+================================================== */
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  align-items: flex-end;
+
+  margin-bottom: 1.25rem;
+
+  h2 {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+  }
+
+  p {
+    max-width: 26rem;
+
+    margin: 0;
+
+    color: $muted;
+
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+}
+
+/* ==================================================
+   LEZIONI DELLA SETTIMANA
+================================================== */
+
+.weekly-lessons {
+  margin-top: 3rem;
+}
+
+.lessons-section-header {
+  margin-bottom: 1.25rem;
+}
+
+.lessons-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 1rem;
+}
+
+/* ==================================================
+   CARD LEZIONI
+================================================== */
+
+.lesson-card {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  min-height: 18rem;
+
+  padding: 1.6rem;
+
+  overflow: hidden;
+
+  border: 1px solid $line;
+  border-radius: 1.25rem;
+
+  background: rgba(255, 255, 255, 0.018);
+
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+
+  &::after {
+    position: absolute;
+    right: -4.5rem;
+    bottom: -5.5rem;
+
+    width: 13rem;
+    height: 13rem;
+
+    content: '';
+
+    pointer-events: none;
+
+    border: 1px solid rgba($accent, 0.065);
+    border-radius: 50%;
+
+    box-shadow:
+      0 0 0 2.5rem rgba($accent, 0.009);
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+}
+
+.lesson-card-header {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.lesson-icon {
+  display: grid;
+  flex: 0 0 auto;
+
+  width: 2.7rem;
+  height: 2.7rem;
+
+  place-items: center;
+
+  border: 1px solid $line;
+  border-radius: 50%;
+
+  font-size: 0.9rem;
+  font-weight: 700;
+
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.lesson-status {
+  padding: 0.35rem 0.65rem;
+
+  border: 1px solid $line;
+  border-radius: 999px;
+
+  color: $muted;
+
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.lesson-value {
+  position: relative;
+  z-index: 1;
+}
+
+.lesson-card-content {
+  position: relative;
+  z-index: 1;
+
+  margin-top: 1rem;
+}
+
+.lesson-card-content h3 {
+  margin: 0;
+
+  color: #e5e6e8;
+
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.lesson-card-content p {
+  max-width: 31rem;
+
+  margin: 0.5rem 0 1.5rem;
+
+  color: $muted;
+
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.lesson-card > a {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+
+  margin-top: auto;
+  padding-top: 1rem;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.055);
+
+  color: #c7c9ce;
+
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  transition: color 180ms ease;
+
+  span {
+    transition: transform 180ms ease;
+  }
+
+  &:hover {
+    color: $accent;
+
+    span {
+      transform: translateX(3px);
+    }
+  }
+
+  &:focus-visible {
+    border-radius: 0.25rem;
+    outline: 2px solid $accent;
+    outline-offset: 0.4rem;
+  }
+}
+
+/* ==================================================
+   LEZIONI CONFERMATE
+================================================== */
+
+.lesson-card.confirmed {
+  border-color: rgba(120, 167, 129, 0.18);
+
+  background:
+    linear-gradient(
+        135deg,
+        rgba(120, 167, 129, 0.035),
+        transparent 55%
+    ),
+    rgba(255, 255, 255, 0.018);
+
+  &::after {
+    border-color: rgba(120, 167, 129, 0.08);
+
+    box-shadow:
+      0 0 0 2.5rem rgba(120, 167, 129, 0.008);
+  }
+
+  &:hover {
+    border-color: rgba(120, 167, 129, 0.35);
+
+    background:
+      linear-gradient(
+          135deg,
+          rgba(120, 167, 129, 0.055),
+          transparent 55%
+      ),
+      rgba(255, 255, 255, 0.018);
+  }
+
+  .lesson-icon {
+    border-color: rgba(120, 167, 129, 0.3);
+
+    color: #9fbea4;
+
+    background: rgba(120, 167, 129, 0.065);
+  }
+
+  .lesson-status {
+    border-color: rgba(120, 167, 129, 0.22);
+
+    color: #9fbea4;
+
+    background: rgba(120, 167, 129, 0.055);
+  }
+}
+
+/* ==================================================
+   LEZIONI DA CONFERMARE
+================================================== */
+
+.lesson-card.pending {
+  border-color: rgba($accent, 0.16);
+
+  background:
+    linear-gradient(
+        135deg,
+        rgba($accent, 0.025),
+        transparent 55%
+    ),
+    rgba(255, 255, 255, 0.018);
+
+  .lesson-icon {
+    border-color: rgba($accent, 0.3);
+
+    color: $accent;
+
+    background: rgba($accent, 0.06);
+  }
+
+  .lesson-status {
+    border-color: rgba($accent, 0.24);
+
+    color: $accent;
+
+    background: rgba($accent, 0.055);
+  }
+
+  &:hover {
+    border-color: rgba($accent, 0.36);
+
+    background:
+      linear-gradient(
+          135deg,
+          rgba($accent, 0.05),
+          transparent 55%
+      ),
+      rgba(255, 255, 255, 0.018);
+  }
+}
+
+.lesson-card.pending.has-pending-lessons {
+  border-color: rgba($accent, 0.34);
+
+  box-shadow:
+    0 0 0 1px rgba($accent, 0.025),
+    0 1.2rem 3rem rgba($accent, 0.055);
+
+  .lesson-icon {
+    box-shadow:
+      0 0 0 4px rgba($accent, 0.055);
+  }
+
+  .lesson-value {
+    color: $accent;
+  }
+}
+
+/* ==================================================
+   LEZIONI DI PROVA
+================================================== */
+
+$trial: #8fb4ff;
+
+.lesson-card.trial {
+  border-color: rgba($trial, 0.16);
+
+  background:
+    linear-gradient(
+        135deg,
+        rgba($trial, 0.03),
+        transparent 55%
+    ),
+    rgba(255, 255, 255, 0.018);
+
+  &::after {
+    border-color: rgba($trial, 0.08);
+  }
+
+  .lesson-icon {
+    border-color: rgba($trial, 0.3);
+    color: $trial;
+    background: rgba($trial, 0.06);
+  }
+
+  .lesson-status {
+    border-color: rgba($trial, 0.24);
+    color: $trial;
+    background: rgba($trial, 0.055);
+  }
+
+  &:hover {
+    border-color: rgba($trial, 0.36);
+  }
+}
+
+.lesson-card.trial.has-trial-lessons {
+  border-color: rgba($trial, 0.34);
+
+  box-shadow:
+    0 0 0 1px rgba($trial, 0.025),
+    0 1.2rem 3rem rgba($trial, 0.05);
+
+  .lesson-value {
+    color: $trial;
+  }
+}
+
+/* ==================================================
+   AZIONI RAPIDE
+================================================== */
+
+.quick-actions {
+  margin-top: 3rem;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 1rem;
+}
+
+.action-card {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+
+  min-height: 6rem;
+
+  padding: 1.2rem;
+
+  border: 1px solid $line;
+  border-radius: 1rem;
+
+  color: inherit;
+  text-decoration: none;
+
+  background: rgba(255, 255, 255, 0.018);
+
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+
+  &:hover {
+    border-color: rgba($accent, 0.3);
+
+    background: rgba($accent, 0.025);
+
+    transform: translateY(-2px);
+
+    .action-arrow {
+      color: $accent;
+      transform: translateX(3px);
+    }
+  }
+}
+
+.action-icon {
+  display: grid;
+  flex: 0 0 auto;
+
+  width: 2.7rem;
+  height: 2.7rem;
+
+  place-items: center;
+
+  border: 1px solid rgba($accent, 0.25);
+  border-radius: 50%;
+
+  color: $accent;
+
+  font-size: 1.2rem;
+}
+
+.action-card div {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  strong {
+    color: #e4e5e7;
+
+    font-size: 0.86rem;
+  }
+
+  span {
+    color: $muted;
+
+    font-size: 0.73rem;
+  }
+}
+
+.action-arrow {
+  color: #777b83;
+
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+/* ==================================================
+   FOOTER
+================================================== */
+
+.dashboard-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+
+  margin-top: 3rem;
+  padding: 1.25rem 0.4rem 0;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.045);
+
+  color: #555961;
+
+  font-size: 0.67rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ==================================================
+   ANIMAZIONI
+================================================== */
+
+@keyframes placeholder-loading {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ==================================================
+   RESPONSIVE TABLET
+================================================== */
+
+@media (max-width: 1200px) and (min-width: 901px) {
+  .lessons-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  :host {
+    --dashboard-header-height: 88px;
+  }
+
+  .dashboard-header {
+    margin-top: 20px;
+    flex-direction: column;
+
+    padding: 2rem;
+  }
+
+  .statistics-grid,
+  .lessons-grid,
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card,
+  .lesson-card {
+    min-height: 15rem;
+  }
+
+  .section-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* ==================================================
+   RESPONSIVE MOBILE
+================================================== */
+
+@media (max-width: 600px) {
+  :host {
+    --dashboard-header-height: 76px;
+  }
+
+  .dashboard-page {
+    padding: 0.75rem;
+  }
+
+  .dashboard-header {
+    margin-top: 20px;
+    padding: 1.5rem;
+
+    border-radius: 1rem;
+  }
+
+  .header-copy h1 {
+    font-size: 2.4rem;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .secondary-button,
+  .logout-button {
+    flex: 1;
+  }
+
+  .dashboard-meta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .stat-card {
+    min-height: 14rem;
+  }
+
+  .weekly-lessons,
+  .quick-actions {
+    margin-top: 2.25rem;
+  }
+
+  .lesson-card {
+    min-height: 14rem;
+
+    padding: 1.35rem;
+  }
+
+  .lesson-card-header {
+    align-items: flex-start;
+  }
+
+  .lesson-value {
+    min-height: 4rem;
+
+    font-size: 3.3rem;
+  }
+
+  .lesson-status {
+    font-size: 0.6rem;
+  }
+
+  .dashboard-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* ==================================================
+   ACCESSIBILITÀ
+================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

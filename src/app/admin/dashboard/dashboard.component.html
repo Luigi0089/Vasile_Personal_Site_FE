@@ -1,0 +1,464 @@
+<main class="dashboard-page">
+
+  <section class="dashboard-shell">
+
+    <!-- HEADER DASHBOARD -->
+    <header class="dashboard-header">
+
+      <div class="header-copy">
+        <span class="eyebrow">
+          Area amministrativa
+        </span>
+
+        <h1>
+          Bentornato,
+          <span>{{ username() }}</span>
+        </h1>
+
+        <p>
+          Gestisci e aggiorna i contenuti del tuo sito personale.
+        </p>
+      </div>
+
+      <div class="header-actions">
+
+        <button
+          type="button"
+          class="logout-button"
+          (click)="logout()"
+        >
+          <span>Esci</span>
+          <span aria-hidden="true">→</span>
+        </button>
+
+      </div>
+
+    </header>
+
+    <!-- DATA E STATO -->
+    <section class="dashboard-meta">
+
+      <div class="date-block">
+        <span class="meta-label">
+          {{ currentDate  }}
+        </span>
+      </div>
+
+      <div
+        class="status-block"
+        [class.online]="backendStatus() === 'online'"
+        [class.offline]="backendStatus() === 'offline'"
+      >
+        <span class="status-dot"></span>
+
+        @if (backendStatus() === 'checking') {
+          <span>Verifica sistema...</span>
+        }
+
+        @if (backendStatus() === 'online') {
+          <span>Sistema operativo</span>
+        }
+
+        @if (backendStatus() === 'offline') {
+          <span>Sistema non raggiungibile</span>
+        }
+      </div>
+
+    </section>
+    <!-- LEZIONI DELLA SETTIMANA -->
+    <section
+      class="weekly-lessons"
+      aria-labelledby="weekly-lessons-title"
+    >
+
+      <div class="section-header lessons-section-header">
+
+        <div>
+          <h2 id="weekly-lessons-title">
+            Lezioni prenotate
+          </h2>
+        </div>
+
+      </div>
+
+      <div class="lessons-grid">
+
+        <!-- LEZIONI CONFERMATE -->
+        <article class="lesson-card confirmed">
+
+          <div class="lesson-card-header">
+
+            <div class="lesson-icon" aria-hidden="true">
+              ✓
+            </div>
+
+            <span class="lesson-status">
+              Confermate
+            </span>
+
+          </div>
+
+          <div class="lesson-value">
+            @if (loadingStatistics()) {
+              <span class="value-placeholder"></span>
+            } @else {
+              {{ statistics().lezioniConfermate }}
+            }
+          </div>
+
+          <div class="lesson-card-content">
+
+            <h3>
+              Lezioni confermate
+            </h3>
+
+            <p>
+              Prenotazioni già accettate per la settimana corrente.
+            </p>
+
+          </div>
+
+          <a
+            [routerLink]="['/admin/lezioni']"
+            [queryParams]="{
+                            vista: 'confermate',
+                            data: todayISO
+                          }"
+          >
+            Gestisci lezioni
+            <span aria-hidden="true">→</span>
+          </a>
+
+        </article>
+
+        <!-- LEZIONI DA CONFERMARE -->
+        <article
+          class="lesson-card pending"
+          [class.has-pending-lessons]="
+            !loadingStatistics() &&
+            statistics().lezioniDaConfermare > 0
+          "
+        >
+
+          <div class="lesson-card-header">
+
+            <div class="lesson-icon" aria-hidden="true">
+              !
+            </div>
+
+            <span class="lesson-status">
+              Da confermare
+            </span>
+
+          </div>
+
+          <div class="lesson-value">
+            @if (loadingStatistics()) {
+              <span class="value-placeholder"></span>
+            } @else {
+              {{ statistics().lezioniDaConfermare }}
+            }
+          </div>
+
+          <div class="lesson-card-content">
+
+            <h3>
+              In attesa di conferma
+            </h3>
+
+            <p>
+              Prenotazioni della settimana che richiedono ancora
+              una tua decisione.
+            </p>
+
+          </div>
+
+          <a
+            routerLink="/admin/lezioni"
+            [queryParams]="{
+                            vista: 'da-confermare',
+                            data: todayISO
+                          }"
+          >
+            Gestisci prenotazioni
+            <span aria-hidden="true">→</span>
+          </a>
+
+        </article>
+
+        <!-- LEZIONI DI PROVA -->
+        <article
+          class="lesson-card trial"
+          [class.has-trial-lessons]="
+            !loadingStatistics() &&
+            statistics().lezioniDiProva > 0
+          "
+        >
+
+          <div class="lesson-card-header">
+
+            <div class="lesson-icon" aria-hidden="true">
+              ★
+            </div>
+
+            <span class="lesson-status">
+              Di prova
+            </span>
+
+          </div>
+
+          <div class="lesson-value">
+            @if (loadingStatistics()) {
+              <span class="value-placeholder"></span>
+            } @else {
+              {{ statistics().lezioniDiProva }}
+            }
+          </div>
+
+          <div class="lesson-card-content">
+
+            <h3>
+              Lezioni di prova
+            </h3>
+
+            <p>
+              Prime lezioni da un'ora prenotate dai nuovi studenti
+              per la settimana corrente.
+            </p>
+
+          </div>
+
+          <a
+            routerLink="/admin/lezioni"
+            [queryParams]="{
+                            vista: 'prova',
+                            data: todayISO
+                          }"
+          >
+            Gestisci lezioni di prova
+            <span aria-hidden="true">→</span>
+          </a>
+
+        </article>
+
+      </div>
+
+    </section>
+
+
+    <div class="section-header lessons-section-header">
+
+      <div style="margin-top: 20px">
+        <h2 id="Skill-title">
+          Gestione Skill
+        </h2>
+      </div>
+
+    </div>
+    <!-- STATISTICHE CONTENUTI -->
+    <section
+      class="statistics-grid"
+      aria-label="Riepilogo contenuti"
+    >
+
+
+      <!-- COMPETENZE -->
+      <article class="stat-card">
+
+        <div class="stat-card-top">
+          <span class="stat-number">01</span>
+          <span class="stat-decoration"></span>
+        </div>
+
+        <div class="stat-value">
+          @if (loadingStatistics()) {
+            <span class="value-placeholder"></span>
+          } @else {
+            {{ statistics().skills }}
+          }
+        </div>
+
+        <h2>Competenze</h2>
+
+        <p>
+          Tecnologie e capacità presenti nel sito.
+        </p>
+
+        <a routerLink="/admin/skills">
+          Gestisci competenze
+          <span aria-hidden="true">→</span>
+        </a>
+
+      </article>
+
+      <!-- CATEGORIE -->
+      <article class="stat-card">
+
+        <div class="stat-card-top">
+          <span class="stat-number">02</span>
+          <span class="stat-decoration"></span>
+        </div>
+
+        <div class="stat-value">
+          @if (loadingStatistics()) {
+            <span class="value-placeholder"></span>
+          } @else {
+            {{ statistics().categories }}
+          }
+        </div>
+
+        <h2>Categorie</h2>
+
+        <p>
+          Gruppi utilizzati per organizzare le competenze.
+        </p>
+
+        <a routerLink="/admin/categories">
+          Gestisci categorie
+          <span aria-hidden="true">→</span>
+        </a>
+
+      </article>
+
+      <!-- KEYWORD -->
+      <article class="stat-card">
+
+        <div class="stat-card-top">
+          <span class="stat-number">03</span>
+          <span class="stat-decoration"></span>
+        </div>
+
+        <div class="stat-value">
+          @if (loadingStatistics()) {
+            <span class="value-placeholder"></span>
+          } @else {
+            {{ statistics().keywords }}
+          }
+        </div>
+
+        <h2>Keyword</h2>
+
+        <p>
+          Parole chiave associate alle competenze.
+        </p>
+
+        <a routerLink="/admin/keywords">
+          Gestisci keyword
+          <span aria-hidden="true">→</span>
+        </a>
+
+      </article>
+
+    </section>
+
+
+
+    <!-- AZIONI RAPIDE -->
+    <section class="quick-actions">
+
+      <div class="section-header">
+
+        <div>
+          <span class="eyebrow">
+            Azioni rapide
+          </span>
+
+          <h2>
+            Cosa vuoi aggiornare?
+          </h2>
+        </div>
+
+        <p>
+          Accedi direttamente alla sezione amministrativa
+          desiderata.
+        </p>
+
+      </div>
+
+      <div class="actions-grid">
+
+        <a
+          routerLink="/admin/skills"
+          [queryParams]="{ nuovo: true }"
+          class="action-card"
+        >
+          <span class="action-icon" aria-hidden="true">
+            +
+          </span>
+
+          <div>
+            <strong>Nuova competenza</strong>
+
+            <span>
+              Aggiungi o modifica una skill.
+            </span>
+          </div>
+
+          <span class="action-arrow" aria-hidden="true">
+            →
+          </span>
+        </a>
+
+        <a
+          routerLink="/admin/categories"
+          [queryParams]="{ nuovo: true }"
+          class="action-card"
+        >
+          <span class="action-icon" aria-hidden="true">
+            +
+          </span>
+
+          <div>
+            <strong>Nuova categoria</strong>
+
+            <span>
+              Organizza meglio le competenze.
+            </span>
+          </div>
+
+          <span class="action-arrow" aria-hidden="true">
+            →
+          </span>
+        </a>
+
+        <a
+          routerLink="/admin/keywords"
+          [queryParams]="{ nuovo: true }"
+          class="action-card"
+        >
+          <span class="action-icon" aria-hidden="true">
+            +
+          </span>
+
+          <div>
+            <strong>Nuova keyword</strong>
+
+            <span>
+              Inserisci una nuova parola chiave.
+            </span>
+          </div>
+
+          <span class="action-arrow" aria-hidden="true">
+            →
+          </span>
+        </a>
+
+      </div>
+
+    </section>
+
+    <footer class="dashboard-footer">
+
+      <span>
+        Personal Site · Administration
+      </span>
+
+      <span>
+        Sessione autenticata come {{ username() }}
+      </span>
+
+    </footer>
+
+  </section>
+
+</main>

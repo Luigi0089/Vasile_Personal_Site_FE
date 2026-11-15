@@ -1,0 +1,47 @@
+@if (visible()) {
+
+  <aside
+    class="cookie-notice"
+    role="region"
+    aria-label="Informazioni sui cookie e sugli strumenti tecnici"
+  >
+
+    <div class="cookie-notice__content">
+
+      <div class="cookie-notice__copy">
+
+        <strong>Questo sito non usa cookie di profilazione</strong>
+
+        <p>
+          Non vengono utilizzati cookie analitici, pubblicitari o di profilazione.
+          Il sito usa soltanto la memoria del browser per ricordare alcune scelte
+          di base, come aver letto questo avviso o l’informativa sulla privacy.
+          Per mostrare caratteri e stile grafico, alcune risorse vengono caricate
+          da servizi esterni (Google Fonts e jsDelivr).
+        </p>
+
+      </div>
+
+      <div class="cookie-notice__actions">
+
+        <a class="cookie-notice__link" routerLink="/privacy">Privacy</a>
+
+        <span aria-hidden="true">·</span>
+
+        <a class="cookie-notice__link" routerLink="/cookie-policy">Cookie Policy</a>
+
+        <button
+          type="button"
+          class="cookie-notice__button"
+          (click)="acknowledge()"
+        >
+          Ho capito
+        </button>
+
+      </div>
+
+    </div>
+
+  </aside>
+
+}

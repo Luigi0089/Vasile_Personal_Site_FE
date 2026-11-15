@@ -1,0 +1,10 @@
+// Variabili condivise. I componenti fanno @use di questo file e NON di styles.scss:
+// styles.scss contiene l'@import dei Google Fonts, che verrebbe duplicato
+// (e inlineato) nel CSS di ogni componente, sforando il budget di build.
+
+$bg:       #0b0b0b;
+$fg:       #e6e6e6;
+$muted:    #a3a3a3;
+$line:     #2a2a2a;
+$accent:   #f1b20b;
+$accent-2: #ffcc3f;

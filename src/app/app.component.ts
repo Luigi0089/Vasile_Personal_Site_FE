@@ -1,13 +1,14 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import {HomepageComponent} from "./homepage/homepage.component";
+import {HomepageComponent} from "./public/homepage/homepage.component";
 import {HeaderComponent} from "./header/header.component";
 import {FooterComponent} from "./footer/footer.component";
+import {CookieNoticeComponent} from "./cookie-notice/cookie-notice.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HomepageComponent, HeaderComponent, FooterComponent],
+  imports: [RouterOutlet, HomepageComponent, HeaderComponent, FooterComponent, CookieNoticeComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

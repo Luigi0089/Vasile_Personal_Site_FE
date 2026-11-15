@@ -1,0 +1,417 @@
+<main class="lessons-page">
+
+  <section class="lessons-shell">
+
+    <!-- HEADER -->
+    <header class="page-header">
+
+      <div class="header-copy">
+
+        <a routerLink="/admin" class="back-link">
+          <span aria-hidden="true">←</span>
+          Dashboard
+        </a>
+
+        <span class="eyebrow">Gestione skill</span>
+
+        <h1>{{ config().titolo }}</h1>
+
+        <p>{{ config().descrizione }}</p>
+
+      </div>
+
+      <div class="header-summary">
+        <span class="summary-label">Totale</span>
+        <strong>{{ totale() }}</strong>
+        <span>{{ config().titolo.toLowerCase() }}</span>
+      </div>
+
+    </header>
+
+    <!-- SWITCH SEZIONE -->
+    <nav class="status-switch" aria-label="Seleziona la sezione">
+      @for (s of sezioni; track s.value) {
+        <a
+          class="section-tab"
+          [routerLink]="['/admin', s.value]"
+          [class.active]="sezione() === s.value"
+          [attr.aria-current]="sezione() === s.value ? 'page' : null"
+        >
+          <span class="tab-icon tab-icon--pending" aria-hidden="true">{{ s.config.icona }}</span>
+          <span class="tab-copy">
+            <strong>{{ s.config.titolo }}</strong>
+            <small>{{ s.config.nuovo }}</small>
+          </span>
+        </a>
+      }
+    </nav>
+
+    <!-- ESITI -->
+    @if (messaggio()) {
+      <section class="feedback-card feedback-card--success" role="status">
+        <div class="feedback-icon feedback-icon--success" aria-hidden="true">✓</div>
+        <div class="feedback-copy">
+          <strong>Operazione completata</strong>
+          <p>{{ messaggio() }}</p>
+        </div>
+      </section>
+    }
+
+    @if (errore()) {
+      <section class="feedback-card feedback-card--error" role="alert">
+        <div class="feedback-icon" aria-hidden="true">!</div>
+        <div class="feedback-copy">
+          <strong>Operazione non riuscita</strong>
+          <p>{{ errore() }}</p>
+        </div>
+        <button type="button" class="secondary-button" (click)="caricaDati()">Ricarica</button>
+      </section>
+    }
+
+    <!-- FORM CREAZIONE / MODIFICA -->
+    <section class="filters-card">
+
+      <div class="filters-header">
+        <div>
+          <span class="section-eyebrow">
+            {{ idInModifica() == null ? 'Inserimento' : 'Modifica' }}
+          </span>
+          <h2>
+            {{ idInModifica() == null ? config().nuovo : 'Modifica ' + config().singolare }}
+          </h2>
+        </div>
+
+        @if (!formAperto()) {
+          <button type="button" class="secondary-button" (click)="apriCreazione()">
+            + {{ config().nuovo }}
+          </button>
+        }
+      </div>
+
+      @if (formAperto()) {
+
+        @if (sezione() === 'skills') {
+          <!-- FORM COMPETENZA -->
+          <form class="content-form" [formGroup]="formSkill" (ngSubmit)="salva()">
+
+            <div class="modal-grid">
+
+              <label class="modal-field">
+                <span>Nome *</span>
+                <input
+                  type="text"
+                  formControlName="name"
+                  maxlength="120"
+                  placeholder="es. Angular"
+                  [class.field-invalid]="campoNonValido(formSkill, 'name')"
+                >
+              </label>
+
+              <label class="modal-field">
+                <span>Livello *</span>
+                <select formControlName="level">
+                  @for (l of livelli; track l.value) {
+                    <option [ngValue]="l.value">{{ l.label }}</option>
+                  }
+                </select>
+              </label>
+
+              <label class="modal-field">
+                <span>Acquisita dal</span>
+                <input type="date" formControlName="acquired">
+                <small>Usata per calcolare gli anni di esperienza.</small>
+              </label>
+
+              <label class="modal-field modal-field--full">
+                <span>Note</span>
+                <textarea
+                  formControlName="notes"
+                  rows="3"
+                  maxlength="1000"
+                  placeholder="Dettagli, progetti, contesto..."
+                ></textarea>
+              </label>
+
+              <!-- CATEGORIE -->
+              <div class="modal-field modal-field--full">
+                <span>
+                  Categorie
+                  <em class="picker-count">{{ formSkill.controls.categories.value.length }} selezionate</em>
+                </span>
+
+                <div class="chip-picker">
+                  @for (c of categorie(); track c.id) {
+                    <button
+                      type="button"
+                      class="chip"
+                      [class.chip--selected]="isSelezionato('categories', c.name)"
+                      [attr.aria-pressed]="isSelezionato('categories', c.name)"
+                      (click)="toggleSelezione('categories', c.name)"
+                    >
+                      {{ c.name }}
+                    </button>
+                  } @empty {
+                    <span class="empty-value">
+                      Nessuna categoria disponibile:
+                      <a routerLink="/admin/categories" [queryParams]="{ nuovo: true }">creane una</a>.
+                    </span>
+                  }
+                </div>
+              </div>
+
+              <!-- KEYWORD -->
+              <div class="modal-field modal-field--full">
+                <span>
+                  Keyword
+                  <em class="picker-count">{{ formSkill.controls.keywords.value.length }} selezionate</em>
+                </span>
+
+                @if (keywords().length > 8) {
+                  <input
+                    type="search"
+                    class="picker-search"
+                    placeholder="Filtra le keyword..."
+                    [value]="filtroKeyword()"
+                    (input)="aggiornaFiltroKeyword($event)"
+                  >
+                }
+
+                <div class="chip-picker chip-picker--scroll">
+                  @for (k of keywordFiltrate(); track k.id) {
+                    <button
+                      type="button"
+                      class="chip"
+                      [class.chip--selected]="isSelezionato('keywords', k.value)"
+                      [attr.aria-pressed]="isSelezionato('keywords', k.value)"
+                      (click)="toggleSelezione('keywords', k.value)"
+                    >
+                      {{ k.value }}
+                    </button>
+                  } @empty {
+                    <span class="empty-value">
+                      @if (keywords().length) {
+                        Nessuna keyword corrisponde al filtro.
+                      } @else {
+                        Nessuna keyword disponibile:
+                        <a routerLink="/admin/keywords" [queryParams]="{ nuovo: true }">creane una</a>.
+                      }
+                    </span>
+                  }
+                </div>
+              </div>
+
+            </div>
+
+            @if (erroreForm()) {
+              <p class="modal-error" role="alert">{{ erroreForm() }}</p>
+            }
+
+            <footer class="modal-actions">
+              <button type="button" class="modal-button modal-button--secondary" (click)="chiudiForm()">
+                Annulla
+              </button>
+              <button type="submit" class="modal-button modal-button--primary" [disabled]="salvataggio()">
+                {{ salvataggio() ? 'Salvataggio...' : (idInModifica() == null ? 'Crea competenza' : 'Salva modifiche') }}
+              </button>
+            </footer>
+
+          </form>
+
+        } @else {
+          <!-- FORM CATEGORIA / KEYWORD -->
+          <form class="content-form" [formGroup]="formNome" (ngSubmit)="salva()">
+
+            <div class="modal-grid">
+              <label class="modal-field modal-field--full">
+                <span>{{ sezione() === 'categories' ? 'Nome categoria' : 'Valore keyword' }} *</span>
+                <input
+                  type="text"
+                  formControlName="valore"
+                  [attr.maxlength]="sezione() === 'categories' ? 100 : 150"
+                  [placeholder]="sezione() === 'categories' ? 'es. Backend' : 'es. Java 17'"
+                  [class.field-invalid]="campoNonValido(formNome, 'valore')"
+                >
+              </label>
+            </div>
+
+            @if (erroreForm()) {
+              <p class="modal-error" role="alert">{{ erroreForm() }}</p>
+            }
+
+            <footer class="modal-actions">
+              <button type="button" class="modal-button modal-button--secondary" (click)="chiudiForm()">
+                Annulla
+              </button>
+              <button type="submit" class="modal-button modal-button--primary" [disabled]="salvataggio()">
+                {{ salvataggio() ? 'Salvataggio...' : (idInModifica() == null ? 'Crea' : 'Salva modifiche') }}
+              </button>
+            </footer>
+
+          </form>
+        }
+      }
+
+    </section>
+
+    <!-- CARICAMENTO -->
+    @if (loading()) {
+      <section class="loading-card" aria-live="polite" aria-busy="true">
+        <span class="spinner" aria-hidden="true"></span>
+        <div>
+          <strong>Caricamento</strong>
+          <p>Recupero {{ config().titolo.toLowerCase() }} dal server.</p>
+        </div>
+      </section>
+    }
+
+    <!-- ELENCO -->
+    @if (!loading()) {
+      <section class="results-card">
+
+        <div class="results-header">
+          <div>
+            <span class="section-eyebrow">Elenco</span>
+            <h2>{{ config().titolo }}</h2>
+          </div>
+          <div class="results-counter">
+            <strong>{{ totale() }}</strong>
+            <span>elementi</span>
+          </div>
+        </div>
+
+        @if (totale() === 0) {
+          <div class="empty-state">
+            <div class="empty-state-icon" aria-hidden="true">{{ config().icona }}</div>
+            <h3>Nessun elemento</h3>
+            <p>Non ci sono ancora {{ config().titolo.toLowerCase() }}.</p>
+            <button type="button" class="secondary-button" (click)="apriCreazione()">
+              + {{ config().nuovo }}
+            </button>
+          </div>
+        } @else if (sezione() === 'skills') {
+
+          <!-- TABELLA COMPETENZE -->
+          <div class="lessons-table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Nome</th>
+                  <th scope="col">Livello</th>
+                  <th scope="col">Acquisita</th>
+                  <th scope="col">Categorie</th>
+                  <th scope="col">Keyword</th>
+                  <th scope="col" class="actions-heading">Azioni</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (s of skills(); track s.id) {
+                  <tr [class.row-editing]="idInModifica() === s.id">
+                    <td data-label="Nome"><strong class="cell-title">{{ s.name }}</strong></td>
+                    <td data-label="Livello">{{ etichettaLivello(s.level) }}</td>
+                    <td data-label="Acquisita">{{ formattaData(s.acquired) }}</td>
+                    <td data-label="Categorie">
+                      <div class="tag-list">
+                        @for (c of s.categories; track c) {
+                          <span class="subject-badge">{{ c }}</span>
+                        } @empty {
+                          <span class="empty-value">—</span>
+                        }
+                      </div>
+                    </td>
+                    <td data-label="Keyword">
+                      <div class="tag-list">
+                        @for (k of s.keywords ?? []; track k) {
+                          <span class="subject-badge">{{ k }}</span>
+                        } @empty {
+                          <span class="empty-value">—</span>
+                        }
+                      </div>
+                    </td>
+                    <td data-label="Azioni" class="actions-cell">
+                      <ng-container
+                        [ngTemplateOutlet]="azioniRiga"
+                        [ngTemplateOutletContext]="{ id: s.id, nome: s.name, modifica: modificaSkill, elemento: s }"
+                      ></ng-container>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+        } @else {
+
+          <!-- TABELLA CATEGORIE / KEYWORD -->
+          <div class="lessons-table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">{{ sezione() === 'categories' ? 'Nome' : 'Valore' }}</th>
+                  <th scope="col">Skill associate</th>
+                  <th scope="col" class="actions-heading">Azioni</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (e of elementiNome(); track e.id) {
+                  <tr [class.row-editing]="idInModifica() === e.id">
+                    <td data-label="Nome"><strong class="cell-title">{{ e.valore }}</strong></td>
+                    <td data-label="Skill">
+                      {{ utilizzi(e.valore) }}
+                    </td>
+                    <td data-label="Azioni" class="actions-cell">
+                      <ng-container
+                        [ngTemplateOutlet]="azioniRiga"
+                        [ngTemplateOutletContext]="{ id: e.id, nome: e.valore, modifica: modificaNome, elemento: e, inUso: utilizzi(e.valore) > 0 }"
+                      ></ng-container>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+      </section>
+    }
+
+  </section>
+
+</main>
+
+<!-- AZIONI DI RIGA (modifica / elimina con conferma inline) -->
+<ng-template #azioniRiga let-id="id" let-nome="nome" let-modifica="modifica" let-elemento="elemento" let-inUso="inUso">
+  <div class="lesson-actions">
+    @if (idDaEliminare() === id) {
+      <span class="confirm-text">Eliminare?</span>
+      <button
+        type="button"
+        class="lesson-action lesson-action--cancel"
+        [disabled]="idInEliminazione() === id"
+        (click)="confermaEliminazione(id, nome)"
+      >
+        {{ idInEliminazione() === id ? 'Elimino...' : 'Sì, elimina' }}
+      </button>
+      <button
+        type="button"
+        class="lesson-action lesson-action--edit"
+        [disabled]="idInEliminazione() === id"
+        (click)="annullaEliminazione()"
+      >
+        No
+      </button>
+    } @else {
+      <button type="button" class="lesson-action lesson-action--edit" (click)="modifica(elemento)">
+        <span aria-hidden="true">✎</span> Modifica
+      </button>
+      <button
+        type="button"
+        class="lesson-action lesson-action--cancel"
+        [disabled]="inUso"
+        [attr.title]="inUso ? 'Ancora associata a delle skill: rimuovila prima dalle competenze' : null"
+        (click)="chiediEliminazione(id)"
+      >
+        <span aria-hidden="true">×</span> Elimina
+      </button>
+    }
+  </div>
+</ng-template>

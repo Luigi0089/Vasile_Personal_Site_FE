@@ -45,14 +45,13 @@ export class StackService {
    */
 
   getCategories(): Observable<CategoryDto[]> {
-    console.log("categorie:")
     return this.http.get<CategoryDto[]>(`${this.BASE}/categories`);
   }
 
   /**
-   * Tutte le keyword disponibili (se ti serviranno come tag/filtri).
+   * Tutte le keyword disponibili (GET /stack/keywords).
    */
   getSkillKeywords(): Observable<KeywordDto[]> {
-    return this.http.get<KeywordDto[]>(`${this.BASE}/skills/keywords`);
+    return this.http.get<KeywordDto[]>(`${this.BASE}/keywords`);
   }
 }
