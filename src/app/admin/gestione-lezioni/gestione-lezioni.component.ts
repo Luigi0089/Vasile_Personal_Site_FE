@@ -131,6 +131,9 @@ export class GestioneLezioniComponent implements OnInit {
   readonly loading =
     signal(false);
 
+  readonly filtriAperti =
+    signal(false);
+
   readonly errore =
     signal<string | null>(null);
 

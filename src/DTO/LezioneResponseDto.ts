@@ -14,4 +14,6 @@ export interface LezioneResponseDto {
   stato?: string;           // "Confermata" | "In approvazione" | "Annullata"
 
   lezioneDiProva?: boolean;
+
+  linkMeet?: string | null; // link Google Meet, generato alla conferma
 }

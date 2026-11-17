@@ -403,6 +403,59 @@ button {
   gap: 0.85rem;
 }
 
+.filters-header--closed {
+  margin-bottom: 0;
+}
+
+.filters-toggle {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-width: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+
+  &:focus-visible {
+    border-radius: 0.5rem;
+    outline: 2px solid $accent;
+    outline-offset: 0.3rem;
+  }
+
+  &:hover .filters-chevron {
+    border-color: rgba($accent, 0.5);
+    color: $accent;
+  }
+}
+
+.filters-toggle-copy {
+  display: block;
+}
+
+.filters-chevron {
+  display: grid;
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid $line;
+  border-radius: 50%;
+  color: $muted;
+  font-size: 0.9rem;
+  transition:
+    transform 180ms ease,
+    color 160ms ease,
+    border-color 160ms ease;
+
+  &.open {
+    transform: rotate(180deg);
+  }
+}
+
 .filter-field {
   display: flex;
   min-width: 0;
@@ -908,6 +961,19 @@ tbody {
     }
   }
 
+  &--meet {
+    color: #8fb4ff;
+    border-color: rgba(143, 180, 255, 0.36);
+    background: rgba(143, 180, 255, 0.055);
+    text-decoration: none;
+
+    &:hover {
+      color: #0b0c10;
+      border-color: #8fb4ff;
+      background: #8fb4ff;
+    }
+  }
+
   &--cancel {
     color: #ef8c8c;
     border-color: rgba(239, 140, 140, 0.34);
@@ -1273,6 +1339,10 @@ tbody {
 }
 
 @media (max-width: 650px) {
+  .lessons-page {
+    padding-inline: 1.25rem;
+  }
+
   .status-switch {
     grid-template-columns: 1fr;
   }
@@ -1293,6 +1363,11 @@ tbody {
   .results-header {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .filters-toggle {
+    flex: none;
+    width: 100%;
   }
 
   .filters-grid {
@@ -1418,7 +1493,7 @@ tbody {
 
 @media (max-width: 450px) {
   .lessons-page {
-    padding-inline: 0.65rem;
+    padding-inline: 1.15rem;
   }
 
   .page-header {

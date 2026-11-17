@@ -216,19 +216,40 @@
     <!-- FILTRI -->
     <section class="filters-card">
 
-      <div class="filters-header">
+      <div
+        class="filters-header"
+        [class.filters-header--closed]="!filtriAperti()"
+      >
 
-        <div>
+        <button
+          type="button"
+          class="filters-toggle"
+          [attr.aria-expanded]="filtriAperti()"
+          aria-controls="filters-form"
+          (click)="filtriAperti.set(!filtriAperti())"
+        >
 
-          <span class="section-eyebrow">
-            Ricerca
+          <span class="filters-toggle-copy">
+
+            <span class="section-eyebrow">
+              Ricerca
+            </span>
+
+            <h2>
+              Filtra e ordina
+            </h2>
+
           </span>
 
-          <h2>
-            Filtra e ordina
-          </h2>
+          <span
+            class="filters-chevron"
+            [class.open]="filtriAperti()"
+            aria-hidden="true"
+          >
+            ▾
+          </span>
 
-        </div>
+        </button>
 
         <button
           type="button"
@@ -242,6 +263,8 @@
       </div>
 
       <form
+        *ngIf="filtriAperti()"
+        id="filters-form"
         class="filters-grid"
         [formGroup]="formFiltri"
       >
@@ -809,6 +832,21 @@
             >
 
               <div class="lesson-actions">
+
+                <a
+                  *ngIf="isConfermata(lezione) && lezione.linkMeet"
+                  class="lesson-action lesson-action--meet"
+                  [href]="lezione.linkMeet"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Apri la videolezione su Google Meet"
+                >
+                  <span aria-hidden="true">
+                    ▶
+                  </span>
+
+                  Meet
+                </a>
 
                 <button
                   *ngIf="!isConfermata(lezione)"

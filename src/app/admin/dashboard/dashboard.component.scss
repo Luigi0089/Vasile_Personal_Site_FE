@@ -976,7 +976,7 @@ $trial: #8fb4ff;
   }
 
   .dashboard-page {
-    padding: 0.75rem;
+    padding: 0.75rem 1.25rem;
   }
 
   .dashboard-header {
@@ -1004,8 +1004,69 @@ $trial: #8fb4ff;
     flex-direction: column;
   }
 
+  /* Card gestione skill compatte: titolo e numero sulla prima riga, link sotto */
+  .statistics-grid {
+    gap: 0.6rem;
+
+    margin-top: 0.75rem;
+  }
+
   .stat-card {
-    min-height: 14rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 0.75rem;
+    align-items: center;
+
+    min-height: 0;
+
+    padding: 0.8rem 1rem;
+
+    border-radius: 1rem;
+
+    &::after {
+      display: none;
+    }
+
+    &:hover {
+      transform: none;
+    }
+
+    .stat-card-top,
+    p {
+      display: none;
+    }
+
+    h2 {
+      grid-column: 1;
+      grid-row: 1;
+
+      margin: 0;
+    }
+
+    .stat-value {
+      grid-column: 2;
+      grid-row: 1;
+
+      min-height: 0;
+      margin-top: 0;
+
+      font-size: 2rem;
+    }
+
+    .stat-value .value-placeholder {
+      width: 2.5rem;
+      height: 2rem;
+    }
+
+    a {
+      grid-column: 1 / -1;
+      grid-row: 2;
+
+      margin-top: 0.7rem;
+      padding-top: 0.6rem;
+
+      font-size: 0.74rem;
+    }
   }
 
   .weekly-lessons,
@@ -1013,24 +1074,91 @@ $trial: #8fb4ff;
     margin-top: 2.25rem;
   }
 
+  /* Card prenotazioni compatte: le tre card stanno nella stessa schermata */
+  .weekly-lessons {
+    margin-top: 1.5rem;
+  }
+
+  .lessons-section-header {
+    margin-bottom: 0.75rem;
+  }
+
+  .lessons-grid {
+    gap: 0.6rem;
+  }
+
   .lesson-card {
-    min-height: 14rem;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: 0.75rem;
+    align-items: center;
 
-    padding: 1.35rem;
+    min-height: 0;
+
+    padding: 0.8rem 1rem;
+
+    border-radius: 1rem;
+
+    &::after {
+      display: none;
+    }
+
+    &:hover {
+      transform: none;
+    }
   }
 
+  /* icona, etichetta e valore diventano celle della griglia della card */
   .lesson-card-header {
-    align-items: flex-start;
+    display: contents;
   }
 
-  .lesson-value {
-    min-height: 4rem;
+  .lesson-icon {
+    grid-column: 1;
+    grid-row: 1;
 
-    font-size: 3.3rem;
+    width: 2.2rem;
+    height: 2.2rem;
+
+    font-size: 0.8rem;
   }
 
   .lesson-status {
+    grid-column: 2;
+    grid-row: 1;
+
+    justify-self: start;
+
     font-size: 0.6rem;
+  }
+
+  .lesson-value {
+    grid-column: 3;
+    grid-row: 1;
+
+    min-height: 0;
+    margin-top: 0;
+
+    font-size: 2rem;
+  }
+
+  .lesson-value .value-placeholder {
+    width: 2.5rem;
+    height: 2rem;
+  }
+
+  .lesson-card-content {
+    display: none;
+  }
+
+  .lesson-card > a {
+    grid-column: 1 / -1;
+    grid-row: 2;
+
+    margin-top: 0.7rem;
+    padding-top: 0.6rem;
+
+    font-size: 0.74rem;
   }
 
   .dashboard-footer {
