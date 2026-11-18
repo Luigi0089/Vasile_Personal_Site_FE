@@ -5,7 +5,8 @@
   <p>
     Scegli uno degli slot liberi: la lezione di prova dura
     <strong>esattamente un'ora</strong>. Riceverai un'email di riepilogo
-    e una successiva conferma.
+    e, quando la prenotazione verrà confermata, una seconda email con il
+    <strong>link per partecipare alla lezione su Google Meet</strong>.
   </p>
 </section>
 
@@ -53,6 +54,16 @@
 
 <div class="notice" *ngIf="errorMsg">{{ errorMsg }}</div>
 
+<!-- Calendario mostrato dallo snapshot mentre il servizio di prenotazione si avvia
+<div class="snapshot-status" *ngIf="statoCalendario === 'snapshot'" role="status">
+  <span class="snapshot-dot"></span>
+  Disponibilità in aggiornamento… puoi già scegliere un orario: la verifica finale avviene alla prenotazione.
+</div>
+<div class="snapshot-status" *ngIf="statoCalendario === 'snapshot-caricamento'" role="status">
+  <span class="snapshot-dot"></span>
+  Caricamento del calendario…
+</div>
+-->
 <div class="legenda">
   <ng-container *ngIf="!isProva; else legendaProva">
     <span><i class="dot dot--free"></i> Libero</span>
@@ -319,6 +330,18 @@
         </div>
       </div>
 
+      <!-- fascia scelta sullo snapshot ma occupata secondo i dati ufficiali -->
+      <div class="conflict" *ngIf="avvisoModale">
+        <div class="conflict-msg">{{ avvisoModale }}</div>
+      </div>
+
+      <!-- prenotazione in attesa che il servizio completi l'avvio (inviata una sola volta) -->
+      <div class="snapshot-status snapshot-status--modal" *ngIf="invioInAttesa" role="status">
+        <span class="snapshot-dot"></span>
+        Il servizio di prenotazione si sta avviando: la tua richiesta verrà inviata automaticamente
+        tra pochi secondi. Non chiudere questa finestra.
+      </div>
+
       <p class="required-hint">
         I campi contrassegnati con <span class="asterisk">*</span> sono obbligatori.
       </p>
@@ -329,7 +352,7 @@
           class="btn-primary"
           [disabled]="loading || form.invalid"
           [ngClass]="{ 'btn-disabled': loading || form.invalid }">
-          {{ isEdit ? 'Salva modifiche' : (isProva ? 'Prenota lezione di prova' : 'Prenota') }}
+          {{ invioInAttesa ? 'In attesa del servizio…' : (isEdit ? 'Salva modifiche' : (isProva ? 'Prenota lezione di prova' : 'Prenota')) }}
         </button>
 
         <button
@@ -371,12 +394,13 @@
 
       <!-- AVVISO EMAIL / SPAM -->
       <p class="mail-notice">
-        Ti abbiamo inviato un'email di riepilogo con tutti i dettagli della prenotazione.
-        Ti chiediamo gentilmente di controllare anche la cartella <strong>Spam</strong> o
-        <strong>Posta indesiderata</strong> per assicurarti di ricevere gli aggiornamenti
-        sullo stato della richiesta.
-        Quando la tua prenotazione verrà confermata riceverai per email il link di google meet per la lezione.
-        Rimango a disposizione per qualsiasi informazione o chiarimento. Non esitare a contattarmi tramite i recapiti disponibili in fondo alla Home.
+        Ti abbiamo inviato un'email di riepilogo con i dettagli della prenotazione.
+        Nella successiva <strong>email di conferma</strong> troverai il link
+        per partecipare alla lezione su <strong>Google Meet</strong>.
+        Se non trovi le nostre email, controlla anche la cartella
+        <strong>Spam</strong> o <strong>Posta indesiderata</strong>.
+        Per qualsiasi chiarimento, puoi contattarci tramite i recapiti disponibili
+        in fondo alla Home.
       </p>
 
       <ul class="riepilogo">
@@ -413,8 +437,8 @@
 </div>
 
 
-<!-- Overlay di caricamento -->
-<div class="loading-overlay" *ngIf="loading">
+<!-- Overlay di caricamento: non copre la modale mentre una prenotazione è in attesa del backend -->
+<div class="loading-overlay" *ngIf="loading && !invioInAttesa">
   <div class="loading-spinner"></div>
 </div>
 

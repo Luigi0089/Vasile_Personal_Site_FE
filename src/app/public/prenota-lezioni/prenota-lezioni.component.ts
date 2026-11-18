@@ -5,9 +5,11 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { addDays, addMinutes, format, startOfWeek } from 'date-fns';
 import { it } from 'date-fns/locale';
+import { Subscription } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
 import { LezioniService } from '../../../Service/lezioni.service';
+import { CalendarioSnapshotService, isSnapshotLezione } from '../../../Service/calendario-snapshot.service';
 import { LezioneRequestDto } from '../../../DTO/LezioneRequestDto';
 import { LezioneResponseDto } from '../../../DTO/LezioneResponseDto';
 import { LezionePubblicaDto } from '../../../DTO/LezionePubblicaDto';
@@ -35,6 +37,16 @@ type OpzioneInizioProva = {
 };
 
 const STATO_CONFERMATA = 'Confermata';
+
+/*
+ * Origine dei dati mostrati nel calendario:
+ * - 'snapshot-caricamento': attesa dello snapshot (nessun dato ancora a schermo)
+ * - 'snapshot': dati dello snapshot su Drive, il backend si sta avviando
+ * - 'ufficiale': dati del backend (prevalgono sempre)
+ * - 'backend-avvio': nessuno snapshot utilizzabile, si attende il backend (spinner classico)
+ * - 'errore-backend': il backend non ha risposto; resta a schermo lo snapshot se presente
+ */
+type StatoCalendario = 'snapshot-caricamento' | 'snapshot' | 'ufficiale' | 'backend-avvio' | 'errore-backend';
 
 /*
  * La pagina ha due modalità:
@@ -73,6 +85,20 @@ export class PrenotaLezioniComponent implements OnInit {
   lezioni: LezionePubblicaDto[] = [];
   loading = false;
   errorMsg = '';
+
+  /** Stato dei dati del calendario (snapshot vs dati ufficiali del backend). */
+  statoCalendario: StatoCalendario = 'snapshot-caricamento';
+  /** Istante di generazione dello snapshot mostrato (solo informativo). */
+  snapshotGeneratedAt?: string;
+  /** Prenotazione in attesa che il backend completi l'avvio (inviata una sola volta). */
+  invioInAttesa = false;
+  /** Messaggio mostrato DENTRO la modale (es. fascia non più disponibile). */
+  avvisoModale = '';
+
+  /* ogni cambio settimana invalida le risposte delle settimane precedenti */
+  private richiestaSettimana = 0;
+  private settimanaUfficialeSub?: Subscription;
+  private settimanaSnapshotSub?: Subscription;
 
   // Modale e form
   modalOpen = false;
@@ -118,7 +144,16 @@ export class PrenotaLezioniComponent implements OnInit {
     { value: 'Universitario', label: 'Universitario' }
   ];
 
-  constructor(private fb: FormBuilder, private lezioniService: LezioniService) {}
+  constructor(
+    private fb: FormBuilder,
+    private lezioniService: LezioniService,
+    private snapshotService: CalendarioSnapshotService
+  ) {}
+
+  /** Dati a schermo provenienti dallo snapshot (il backend non ha ancora confermato). */
+  get datiProvvisori(): boolean {
+    return this.statoCalendario === 'snapshot' || this.statoCalendario === 'errore-backend';
+  }
 
   showError(controlName: string): boolean {
     const control = this.form.get(controlName);
@@ -189,9 +224,17 @@ export class PrenotaLezioniComponent implements OnInit {
     this.goToWeek(addDays(this.weekStart, 7));
   }
 
+  /*
+   * Caricamento della settimana in due binari paralleli:
+   * 1) richiesta UFFICIALE al backend, avviata per prima (sveglia anche Spring se è spento);
+   * 2) snapshot su Google Drive (scaricato una sola volta per sessione), mostrato subito.
+   * Regole: i dati ufficiali prevalgono sempre; uno snapshot arrivato in ritardo non li
+   * sovrascrive mai; le risposte di settimane non più visualizzate vengono ignorate;
+   * la griglia non si svuota durante il passaggio dallo snapshot ai dati ufficiali.
+   */
   goToWeek(anchor: Date): void {
-    this.loading = true;
     this.errorMsg = '';
+    const richiesta = ++this.richiestaSettimana;
 
     this.weekStart = startOfWeek(anchor, { weekStartsOn: 1 }); // lun
     // prendi sabato come fine (non domenica)
@@ -202,19 +245,78 @@ export class PrenotaLezioniComponent implements OnInit {
     );
 
     const queryDate = format(anchor, 'yyyy-MM-dd');
+    const lunediISO = this.daysISO[0];
+    const sabatoISO = this.daysISO[5];
 
-    this.lezioniService.getLezioniSettimana(queryDate)
-      .pipe(finalize(() => this.loading = false))
+    // le richieste della settimana precedente non servono più.
+    // Nota: annullare la sottoscrizione chiude solo la risposta lato browser; un backend
+    // spento continua comunque ad avviarsi, quindi non si perde il risveglio di Spring.
+    this.settimanaUfficialeSub?.unsubscribe();
+    this.settimanaSnapshotSub?.unsubscribe();
+    // una prenotazione in attesa riguarda la settimana precedente: si annulla (il form resta compilato)
+    this.annullaInvioInAttesa();
+
+    let ufficialeArrivata = false;
+
+    // senza snapshot (disattivato) il comportamento è quello di sempre: spinner fino al backend
+    this.statoCalendario = this.snapshotService.abilitato ? 'snapshot-caricamento' : 'backend-avvio';
+    this.loading = !this.snapshotService.abilitato;
+
+    // 1) dati ufficiali: partono SUBITO, senza aspettare lo snapshot
+    this.settimanaUfficialeSub = this.lezioniService.getLezioniSettimana(queryDate)
+      .pipe(finalize(() => {
+        // vale solo per la settimana ancora visualizzata; un invio in attesa gestisce da sé lo spinner
+        if (richiesta === this.richiestaSettimana && !this.invioInAttesa) {
+          this.loading = false;
+        }
+      }))
       .subscribe({
         next: (lez) => {
-          this.lezioni = lez ?? [];
-          this.buildGrid();
+          if (richiesta !== this.richiestaSettimana) { return; }
+          ufficialeArrivata = true;
+          this.settimanaSnapshotSub?.unsubscribe();
+          this.applicaLezioni(lez ?? [], 'ufficiale');
+          this.snapshotGeneratedAt = undefined;
+          this.riprendiInvioInAttesa();
         },
         error: (err) => {
-          this.errorMsg = 'Errore nel caricamento delle lezioni.';
+          if (richiesta !== this.richiestaSettimana) { return; }
           console.error(err);
+          if (this.datiProvvisori) {
+            // resta a schermo lo snapshot: il calendario si vede, la prenotazione no
+            this.statoCalendario = 'errore-backend';
+            this.errorMsg = 'Il servizio di prenotazione non è al momento raggiungibile: '
+              + 'il calendario mostrato potrebbe non essere aggiornato. Riprova tra poco.';
+          } else {
+            this.statoCalendario = 'errore-backend';
+            this.errorMsg = 'Errore nel caricamento delle lezioni.';
+          }
+          this.annullaInvioInAttesa();
         }
       });
+
+    // 2) snapshot: solo se abilitato e solo finché i dati ufficiali non sono arrivati
+    if (this.snapshotService.abilitato) {
+      this.settimanaSnapshotSub = this.snapshotService.settimana(lunediISO, sabatoISO)
+        .subscribe(s => {
+          if (richiesta !== this.richiestaSettimana || ufficialeArrivata) { return; }
+          if (s) {
+            this.applicaLezioni(s.lezioni, 'snapshot');
+            this.snapshotGeneratedAt = s.generatedAt;
+            this.loading = false;
+          } else if (this.statoCalendario === 'snapshot-caricamento') {
+            // settimana non coperta o snapshot non disponibile: si attende il backend
+            this.statoCalendario = 'backend-avvio';
+            this.loading = true;
+          }
+        });
+    }
+  }
+
+  private applicaLezioni(lezioni: LezionePubblicaDto[], origine: 'snapshot' | 'ufficiale'): void {
+    this.lezioni = lezioni;
+    this.statoCalendario = origine;
+    this.buildGrid();
   }
 
   private buildGrid(): void {
@@ -314,6 +416,12 @@ export class PrenotaLezioniComponent implements OnInit {
     if (!slot.busy) {
       this.onClickFree(slot);
     } else if (!this.isProva) {
+      // lo snapshot non contiene l'id reale della lezione: la modifica si apre
+      // solo quando arrivano i dati ufficiali del backend
+      if (isSnapshotLezione(slot.bookedBy)) {
+        this.errorMsg = 'Sto ancora caricando i dati aggiornati: tra qualche secondo potrai modificare questa lezione.';
+        return;
+      }
       // in modalità prova gli slot occupati non sono selezionabili
       this.onClickBusy(slot);
     }
@@ -427,9 +535,12 @@ export class PrenotaLezioniComponent implements OnInit {
 
 
   closeModal(): void {
+    // chiudere la modale annulla anche un invio rimasto in attesa del backend
+    this.annullaInvioInAttesa();
     this.submitted = false;
     this.modalOpen = false;
     this.errorMsg = "";
+    this.avvisoModale = '';
   }
 
   private buildRequest(): LezioneRequestDto {
@@ -454,9 +565,10 @@ export class PrenotaLezioniComponent implements OnInit {
   submit(): void {
     // reset errori precedenti
     this.errorMsg = '';
+    this.avvisoModale = '';
     this.conflict = undefined;
 
-    if (this.loading) {
+    if (this.loading || this.invioInAttesa) {
       return;
     }
 
@@ -467,6 +579,64 @@ export class PrenotaLezioniComponent implements OnInit {
       return;
     }
 
+    /*
+     * Calendario ancora da snapshot: il backend si sta avviando e la richiesta ufficiale della
+     * settimana è già in corso. La prenotazione non viene inviata in parallelo (sarebbe una
+     * seconda richiesta lenta verso un backend in avvio): resta in attesa con la selezione
+     * intatta e parte UNA sola volta, dopo aver ricontrollato la fascia sui dati ufficiali.
+     */
+    if (this.statoCalendario === 'snapshot' || this.statoCalendario === 'snapshot-caricamento') {
+      this.invioInAttesa = true;
+      this.loading = true;
+      return;
+    }
+
+    this.inviaPrenotazione();
+  }
+
+  /** Chiamato quando arrivano i dati ufficiali: completa l'eventuale prenotazione in attesa. */
+  private riprendiInvioInAttesa(): void {
+    if (!this.invioInAttesa) {
+      return;
+    }
+    this.invioInAttesa = false;
+    this.loading = false;
+
+    // la modale potrebbe essere stata chiusa nel frattempo: niente invio "nascosto"
+    if (!this.modalOpen) {
+      return;
+    }
+
+    // la fascia scelta sullo snapshot potrebbe non essere più libera secondo i dati ufficiali
+    if (!this.isEdit && this.fasciaOccupataNeiDatiUfficiali()) {
+      if (this.isProvaCreazione) {
+        this.opzioniInizioProva = this.calcolaOpzioniInizioProva(this.form.controls.dataLezione.value!);
+        this.form.controls.orarioInizio.setValue('');
+        this.form.controls.orarioFine.setValue('');
+      }
+      this.avvisoModale = 'L\'orario scelto non è più disponibile: il calendario è stato aggiornato, scegli un altro orario.';
+      return;
+    }
+
+    this.inviaPrenotazione();
+  }
+
+  private annullaInvioInAttesa(): void {
+    if (!this.invioInAttesa) {
+      return;
+    }
+    this.invioInAttesa = false;
+    this.loading = false;
+    // la selezione resta nel form: lo studente può riprovare senza reinserire i dati
+  }
+
+  private fasciaOccupataNeiDatiUfficiali(): boolean {
+    const v = this.form.getRawValue();
+    return !!v.dataLezione && !!v.orarioInizio && !!v.orarioFine
+      && !!this.findOverlappingLesson(v.dataLezione, v.orarioInizio, v.orarioFine);
+  }
+
+  private inviaPrenotazione(): void {
     const request = this.buildRequest();
 
     const obs = this.isEdit && request.id
@@ -485,7 +655,8 @@ export class PrenotaLezioniComponent implements OnInit {
         next: (res) => {
           this.closeModal();
           this.openSuccessModal(res);
-          this.goToWeek(this.weekStart);
+          // dopo una prenotazione si mostrano solo dati ufficiali (lo snapshot è ormai superato)
+          this.ricaricaSettimanaUfficiale();
           this.submitted = false;
         },
         error: (err) => {
@@ -551,9 +722,11 @@ export class PrenotaLezioniComponent implements OnInit {
             this.conflict = body as ConflictResponse;
             console.error('Conflict response', body);
 
-            // in modalità prova l'orario è stato preso nel frattempo: aggiorno griglia e opzioni
+            // l'orario è stato preso nel frattempo: aggiorno la griglia con i dati ufficiali
             if (this.isProvaCreazione) {
               this.ricaricaDisponibilitaProva();
+            } else {
+              this.ricaricaSettimanaUfficiale();
             }
             return;
           }
@@ -576,10 +749,12 @@ export class PrenotaLezioniComponent implements OnInit {
       return;
     }
 
+    const richiesta = this.richiestaSettimana;
     this.lezioniService.getLezioniSettimana(dayISO).subscribe({
       next: lez => {
-        this.lezioni = lez ?? [];
-        this.buildGrid();
+        if (richiesta !== this.richiestaSettimana) { return; } // l'utente ha cambiato settimana
+        this.settimanaSnapshotSub?.unsubscribe();
+        this.applicaLezioni(lez ?? [], 'ufficiale');
         this.opzioniInizioProva = this.calcolaOpzioniInizioProva(dayISO);
 
         const scelta = this.opzioniInizioProva.find(o => o.start === this.form.controls.orarioInizio.value);
@@ -590,6 +765,31 @@ export class PrenotaLezioniComponent implements OnInit {
       },
       error: err => console.error(err)
     });
+  }
+
+  /*
+   * Ricarica la settimana visualizzata SOLO dal backend, senza passare dallo snapshot
+   * (dopo prenotazioni, annullamenti e conflitti lo snapshot è certamente superato).
+   * La griglia attuale resta a schermo finché non arrivano i dati nuovi.
+   */
+  private ricaricaSettimanaUfficiale(): void {
+    const richiesta = ++this.richiestaSettimana;
+    this.settimanaUfficialeSub?.unsubscribe();
+    this.settimanaSnapshotSub?.unsubscribe();
+
+    this.settimanaUfficialeSub = this.lezioniService.getLezioniSettimana(this.daysISO[0])
+      .subscribe({
+        next: lez => {
+          if (richiesta !== this.richiestaSettimana) { return; }
+          this.applicaLezioni(lez ?? [], 'ufficiale');
+          this.snapshotGeneratedAt = undefined;
+        },
+        error: err => {
+          if (richiesta !== this.richiestaSettimana) { return; }
+          console.error(err);
+          this.errorMsg = 'Errore nel caricamento delle lezioni.';
+        }
+      });
   }
 
   annulla(id?: string | number): void {
@@ -614,7 +814,7 @@ export class PrenotaLezioniComponent implements OnInit {
       .subscribe({
         next: () => {
           this.closeModal();
-          this.goToWeek(this.weekStart);
+          this.ricaricaSettimanaUfficiale();
         },
         error: err => {
           const body: any = err?.error && typeof err.error === 'object' ? err.error : null;
